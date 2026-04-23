@@ -1,6 +1,21 @@
+const hostedApiFallback = 'https://cityexplorer-backend.onrender.com/api';
+
+const resolveProductionApiBaseUrl = () => {
+  const configuredApiUrl = String(import.meta.env.VITE_API_URL || '').trim();
+  if (configuredApiUrl) {
+    return configuredApiUrl;
+  }
+
+  if (typeof window !== 'undefined' && window.location.hostname.endsWith('netlify.app')) {
+    return hostedApiFallback;
+  }
+
+  return '/api';
+};
+
 const apiBaseUrl = import.meta.env.DEV
   ? '/api'
-  : import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+  : resolveProductionApiBaseUrl();
 
 export const getApiOrigin = () => {
   if (apiBaseUrl.startsWith('/')) {
@@ -10,7 +25,7 @@ export const getApiOrigin = () => {
   try {
     return new URL(apiBaseUrl).origin;
   } catch (error) {
-    return 'http://localhost:8000';
+    return window.location.origin;
   }
 };
 

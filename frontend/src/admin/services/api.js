@@ -1,8 +1,24 @@
+
 import axios from 'axios';
+
+const hostedApiFallback = 'https://cityexplorer-backend.onrender.com/api';
+
+const resolveProductionApiBaseUrl = () => {
+  const configuredApiUrl = String(import.meta.env.VITE_API_URL || '').trim();
+  if (configuredApiUrl) {
+    return configuredApiUrl;
+  }
+
+  if (typeof window !== 'undefined' && window.location.hostname.endsWith('netlify.app')) {
+    return hostedApiFallback;
+  }
+
+  return '/api';
+};
 
 const baseURL = import.meta.env.DEV
   ? '/api'
-  : import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+  : resolveProductionApiBaseUrl();
 
 const api = axios.create({
   baseURL,
