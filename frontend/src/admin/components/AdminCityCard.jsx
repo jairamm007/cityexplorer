@@ -74,7 +74,7 @@ const AdminCityCard = ({ city, onDelete, onViewPlaces, deleting = false, placeCo
             {placeCount} places
           </button>
           <Link
-            to={`/cities/edit/${cityId}`}
+            to={`/admin/cities/edit/${cityId}`}
             onClick={(event) => event.stopPropagation()}
             className="inline-flex rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
           >

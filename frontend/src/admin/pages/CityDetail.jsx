@@ -113,7 +113,7 @@ const PlaceCard = ({ place, onDelete, deleting }) => {
             View in Google
           </a>
           <Link
-            to={`/places/edit/${place._id}`}
+            to={`/admin/places/edit/${place._id}`}
             onClick={(event) => event.stopPropagation()}
             className="inline-flex rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
           >
@@ -411,7 +411,7 @@ const CityDetail = () => {
             <button type="button" onClick={() => navigate('/admin/cities')} className="ui-action-ghost">
               Back to cities
             </button>
-            <Link to={`/cities/edit/${city._id}`} className="ui-action-pill">
+            <Link to={`/admin/cities/edit/${city._id}`} className="ui-action-pill">
               Edit city
             </Link>
             <button

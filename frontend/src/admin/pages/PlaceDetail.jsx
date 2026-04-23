@@ -302,7 +302,7 @@ const PlaceDetail = () => {
             <button type="button" onClick={() => navigate('/admin/places')} className="ui-action-ghost">
               Back to places
             </button>
-            <Link to={`/places/edit/${place._id}`} className="ui-action-pill">
+            <Link to={`/admin/places/edit/${place._id}`} className="ui-action-pill">
               Edit place
             </Link>
             <button
