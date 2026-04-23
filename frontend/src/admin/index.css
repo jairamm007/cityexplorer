@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  font-family: 'Manrope', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 400;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+}
+
+nav,
+nav a,
+nav button,
+button {
+  font-weight: 500;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+@layer components {
+  .ui-nav-ghost {
+    @apply rounded-full border border-slate-300/80 bg-white/60 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:border-slate-500 hover:bg-white hover:text-slate-900;
+  }
+
+  .ui-nav-ghost-active {
+    @apply border-amber-400 bg-amber-50 text-amber-700;
+  }
+
+  .ui-nav-pill {
+    @apply rounded-full border border-slate-300/80 bg-white/60 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:border-slate-500 hover:bg-white hover:text-slate-900;
+  }
+
+  .ui-nav-muted {
+    @apply text-slate-600 transition hover:text-slate-900;
+  }
+
+  .ui-nav-logout {
+    @apply rounded-full bg-slate-900 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-slate-700;
+  }
+
+  .ui-action-pill {
+    @apply rounded-full border border-slate-300/80 bg-white/60 px-5 py-3 text-sm font-medium text-slate-700 transition hover:border-slate-500 hover:bg-white hover:text-slate-900;
+  }
+
+  .ui-action-ghost {
+    @apply rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100;
+  }
+}
