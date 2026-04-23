@@ -1,6 +1,8 @@
 # CityExplorer MERN App
 
-## ✅ Status: READY TO TEST
+City Explorer is a full-stack web application built using the MERN stack (MongoDB, Express.js, React.js, Node.js) that allows users to explore cities, discover popular attractions, and manage travel-related information in an interactive and user-friendly interface.
+
+## ? Status: READY TO TEST
 
 Both portals run from the same frontend server:
 - **Backend**: http://localhost:8000
@@ -29,86 +31,86 @@ The objectives of this system are:
 
 ### 1. Backend
 
-Open a terminal in `C:\Users\maddu\CityExplorer\backend`:
+Open a terminal in C:\Users\maddu\CityExplorer\backend:
 
-```powershell
+`powershell
 npm install
 npm run dev
-```
+`
 
-The backend will run on `http://localhost:8000`.
+The backend will run on http://localhost:8000.
 
 ### 2. Frontend
 
-Open a terminal in `C:\Users\maddu\CityExplorer\frontend`:
+Open a terminal in C:\Users\maddu\CityExplorer\frontend:
 
-```powershell
+`powershell
 npm install
 npm run dev
-```
+`
 
-The frontend will run on `http://localhost:3001`.
+The frontend will run on http://localhost:3001.
 
 ### 3. Admin Portal
 
-Open a terminal in `C:\Users\maddu\CityExplorer\frontend`:
+Open a terminal in C:\Users\maddu\CityExplorer\frontend:
 
-```powershell
+`powershell
 npm install
 npm run dev
-```
+`
 
-The admin portal will run on `http://localhost:3001/admin`.
+The admin portal will run on http://localhost:3001/admin.
 
 ## Seed Sample Data
 
 There is a simple seed script to populate cities and attractions into MongoDB.
 
-From `backend` run:
+From ackend run:
 
-```powershell
+`powershell
 npm run seed
-```
+`
 
-To create or update the first admin account, set these environment variables in `backend/.env` and run the admin seed script:
+To create or update the first admin account, set these environment variables in ackend/.env and run the admin seed script:
 
-```text
+`	ext
 ADMIN_NAME="Admin Name"
 ADMIN_EMAIL="admin@example.com"
 ADMIN_PASSWORD="StrongPassword123"
-```
+`
 
-```powershell
+`powershell
 npm run seed:admin
-```
+`
 
 ## Environment
 
-### Backend `.env`
+### Backend .env
 
 The backend reads:
 
-```text
+`	ext
 MONGODB_URI="mongodb://localhost:27017/cityexplorer"
 JWT_SECRET="CityExplorerSecretKey"
 PORT=8000
 NODE_ENV=development
-```
+`
 
-### Frontend `.env`
+### Frontend .env
 
 The frontend reads:
 
-```text
+`	ext
 VITE_API_URL=http://localhost:8000/api
 VITE_ROUTER_BASENAME=/
-```
+`
 
 ## Notes
 
 - The backend uses Express, Mongoose, JWT auth, and routes for cities, attractions, reviews, and auth.
 - The frontend uses React, React Router, Tailwind CSS, and Leaflet/OpenStreetMap for maps.
-- The admin portal is embedded under the same frontend app at `/admin`.
+- The admin portal is embedded under the same frontend app at /admin.
 - Weather data is fetched from the free Open-Meteo API.
 
 ## User Flow
@@ -129,17 +131,17 @@ If the seed script fails with a DNS or Atlas connection error, verify:
 
 - Internet access from your machine
 - Atlas cluster network access settings
-- `MONGODB_URI` is correct
+- MONGODB_URI is correct
 
-If needed, you can use a local MongoDB URI in `backend/.env` instead.
+If needed, you can use a local MongoDB URI in ackend/.env instead.
 
 ## Deploy On One URL (Render)
 
 To serve both portals from one domain and one port:
 
-- User portal: `/`
-- Admin portal: `/admin`
-- API: `/api`
+- User portal: /
+- Admin portal: /admin
+- API: /api
 
 Use one Render Web Service connected to this repository root.
 
@@ -148,34 +150,34 @@ Use one Render Web Service connected to this repository root.
 - **Root Directory**: leave empty (repo root)
 - **Build Command**:
 
-```bash
+`ash
 npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend
-```
+`
 
 - **Start Command**:
 
-```bash
+`ash
 node backend/server.js
-```
+`
 
 ### Render Environment Variables
 
 Set these in Render:
 
-- `MONGODB_URI`
-- `JWT_SECRET`
-- `NODE_ENV=production`
-- `PORT` (Render provides this automatically; do not hardcode)
+- MONGODB_URI
+- JWT_SECRET
+- NODE_ENV=production
+- PORT (Render provides this automatically; do not hardcode)
 
 ### Frontend/Admin Build Variables (Optional)
 
 If your backend is served from the same domain, set:
 
-- `VITE_API_URL=/api`
-- `VITE_ROUTER_BASENAME=/` for frontend
+- VITE_API_URL=/api
+- VITE_ROUTER_BASENAME=/ for frontend
 
-Note: the admin portal is part of the same frontend build and is routed at `/admin`.
+Note: the admin portal is part of the same frontend build and is routed at /admin.
 
 The backend already serves:
 
-- `frontend/dist` at `/` (including `/admin` route via SPA fallback)
+- rontend/dist at / (including /admin route via SPA fallback)
