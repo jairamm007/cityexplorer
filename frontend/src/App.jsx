@@ -6,6 +6,7 @@ import Navbar from './components/UserNavbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/UserProtectedRoute';
 import { useAuth } from './components/UserAuthContext';
+import { AdminAuthProvider } from './admin/components/AuthContext';
 
 const Home = lazy(() => import('./pages/UserHome'));
 const Login = lazy(() => import('./pages/UserLogin'));
@@ -49,7 +50,7 @@ function App() {
             />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/admin/*" element={<AdminShellApp />} />
+            <Route path="/admin/*" element={<AdminAuthProvider><AdminShellApp /></AdminAuthProvider>} />
             <Route
               path="/explore"
               element={
