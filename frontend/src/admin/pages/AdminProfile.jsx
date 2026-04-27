@@ -14,6 +14,8 @@ const AdminProfile = () => {
   const [profileImageUrlInput, setProfileImageUrlInput] = useState('');
   const [cropImageSrc, setCropImageSrc] = useState('');
   const [cropOpen, setCropOpen] = useState(false);
+  const [nameSuggestions, setNameSuggestions] = useState([]);
+  const [nameStatus, setNameStatus] = useState('idle');
   const [formData, setFormData] = useState({
     name: '',
     profileImage: '',
@@ -56,6 +58,38 @@ const AdminProfile = () => {
     }));
   }, [user]);
 
+  useEffect(() => {
+    const trimmedName = formData.name.trim();
+    const currentName = String(user?.name || '').trim();
+
+    if (!trimmedName || !user) {
+      setNameStatus('idle');
+      setNameSuggestions([]);
+      return undefined;
+    }
+
+    if (trimmedName === currentName) {
+      setNameStatus('idle');
+      setNameSuggestions([]);
+      return undefined;
+    }
+
+    setNameStatus('checking');
+    const timeoutId = window.setTimeout(async () => {
+      try {
+        const response = await api.get('/admin/auth/profile-name-status', {
+          params: { name: trimmedName },
+        });
+        setNameStatus(response.data.available ? 'available' : 'taken');
+        setNameSuggestions(Array.isArray(response.data.suggestions) ? response.data.suggestions : []);
+      } catch (error) {
+        setNameStatus('idle');
+      }
+    }, 300);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [formData.name, user]);
+
   const imagePreview = resolveImageUrl(formData.profileImage || user?.profileImage || '');
 
   const uploadProfileImage = async (file) => {
@@ -93,6 +127,9 @@ const AdminProfile = () => {
       ...prev,
       [name]: value,
     }));
+    if (name === 'name' && nameSuggestions.length) {
+      setNameSuggestions([]);
+    }
   };
 
   const handlePasswordChange = (event) => {
@@ -311,6 +348,32 @@ const AdminProfile = () => {
                 className="mt-2 w-full rounded-[28px] border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-slate-900"
                 required
               />
+              {formData.name.trim() && nameStatus === 'checking' ? (
+                <p className="mt-2 text-xs text-slate-500">Checking profile name...</p>
+              ) : null}
+              {formData.name.trim() && nameStatus === 'available' ? (
+                <p className="mt-2 text-xs text-emerald-600">This profile name is available.</p>
+              ) : null}
+              {nameSuggestions.length ? (
+                <div className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 p-3">
+                  <p className="text-xs font-semibold uppercase tracking-[0.15em] text-amber-700">Profile name is taken. Try one of these</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {nameSuggestions.map((suggestion) => (
+                      <button
+                        key={suggestion}
+                        type="button"
+                        onClick={() => {
+                          setFormData((prev) => ({ ...prev, name: suggestion }));
+                          setNameSuggestions([]);
+                        }}
+                        className="rounded-full border border-amber-300 bg-white px-3 py-1 text-sm font-medium text-amber-700 transition hover:bg-amber-100"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
             </div>
 
             <div>
@@ -335,10 +398,10 @@ const AdminProfile = () => {
 
             <button
               type="submit"
-              disabled={savingProfile || uploadingImage}
+              disabled={savingProfile || uploadingImage || nameStatus === 'checking' || nameStatus === 'taken'}
               className="rounded-full bg-amber-400 px-6 py-3 font-semibold text-slate-900 transition hover:bg-amber-500 disabled:opacity-50"
             >
-              {savingProfile ? 'Saving profile...' : 'Save Profile'}
+              {savingProfile ? 'Saving profile...' : nameStatus === 'checking' ? 'Checking name...' : 'Save Profile'}
             </button>
           </form>
         </div>

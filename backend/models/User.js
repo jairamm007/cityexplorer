@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const { normalizePersistedImageUrl } = require('../utils/imageUrl');
+const { normalizeProfileName, toProfileNameKey } = require('../utils/profileName');
 
 const plannedTripSchema = new mongoose.Schema(
   {
@@ -19,6 +21,7 @@ const plannedTripSchema = new mongoose.Schema(
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
+    nameKey: { type: String, unique: true, sparse: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     password: {
       type: String,
@@ -48,5 +51,18 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+userSchema.pre('validate', function setNameKey(next) {
+  if (typeof this.name === 'string') {
+    this.name = normalizeProfileName(this.name);
+    this.nameKey = toProfileNameKey(this.name);
+  }
+
+  if (typeof this.profileImage === 'string') {
+    this.profileImage = normalizePersistedImageUrl(this.profileImage);
+  }
+
+  next();
+});
 
 module.exports = mongoose.model('User', userSchema);

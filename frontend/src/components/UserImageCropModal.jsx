@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Cropper from 'react-easy-crop';
 import { toast } from 'react-toastify';
 import 'react-easy-crop/react-easy-crop.css';
+import { resolveImageProxyUrl } from '../utils/userImageHelpers';
 
 const createImage = (url) =>
   new Promise((resolve, reject) => {
@@ -11,18 +12,6 @@ const createImage = (url) =>
     image.onerror = (error) => reject(error);
     image.src = url;
   });
-
-const buildCropSource = (source) => {
-  if (!source) {
-    return source;
-  }
-
-  if (/^https?:\/\//i.test(source)) {
-    return `/api/utils/image-proxy?url=${encodeURIComponent(source)}`;
-  }
-
-  return source;
-};
 
 const getCroppedFile = async (imageSrc, pixelCrop) => {
   const image = await createImage(imageSrc);
@@ -83,7 +72,7 @@ const ImageCropModal = ({ isOpen, imageSrc, onClose, onApply, initialAspect = 16
 
     setSaving(true);
     try {
-      const cropSource = buildCropSource(imageSrc);
+      const cropSource = resolveImageProxyUrl(imageSrc);
       const result = await getCroppedFile(cropSource, croppedAreaPixels);
       onApply(result);
     } catch (error) {

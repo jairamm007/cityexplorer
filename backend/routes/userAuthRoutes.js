@@ -4,6 +4,7 @@ const {
   registerUser,
   loginUser,
   googleSignIn,
+  checkProfileNameAvailability,
   getProfile,
 } = require('../controllers/userAuthController');
 const { protect } = require('../middleware/userAuthMiddleware');
@@ -26,13 +27,14 @@ router.post(
 router.post(
   '/login',
   [
-    body('email').trim().isEmail().withMessage('Valid email is required'),
+    body('identifier').trim().notEmpty().withMessage('Email or profile name is required'),
     body('password').notEmpty().withMessage('Password is required'),
   ],
   loginUser
 );
 
 router.post('/google', googleSignIn);
+router.get('/profile-name-status', checkProfileNameAvailability);
 router.get('/profile', protect, getProfile);
 
 module.exports = router;

@@ -67,6 +67,8 @@ const PlaceSearchCard = ({
   distanceText,
   description,
   showViewLink = false,
+  onPlan,
+  planLoading = false,
 }) => {
   const handleKeyDown = (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -89,15 +91,30 @@ const PlaceSearchCard = ({
           <h3 className="text-xl font-semibold text-slate-900">{place.name}</h3>
           {subtitle ? <p className="mt-1 text-sm text-slate-500">{subtitle}</p> : null}
         </div>
-        {showViewLink ? (
-          <Link
-            to={`/attraction/${place._id}`}
-            onClick={(event) => event.stopPropagation()}
-            className="rounded-full bg-amber-400 px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-amber-300"
-          >
-            View
-          </Link>
-        ) : null}
+        <div className="flex flex-wrap gap-2">
+          {showViewLink ? (
+            <Link
+              to={`/attraction/${place._id}`}
+              onClick={(event) => event.stopPropagation()}
+              className="rounded-full bg-amber-400 px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-amber-300"
+            >
+              View
+            </Link>
+          ) : null}
+          {onPlan ? (
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                onPlan(place);
+              }}
+              disabled={planLoading}
+              className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {planLoading ? 'Adding...' : 'Add to planner'}
+            </button>
+          ) : null}
+        </div>
       </div>
       {description ? <p className="mt-4 text-slate-600">{description}</p> : null}
       {place.location ? <p className="mt-3 text-sm text-slate-500">Location: {place.location}</p> : null}
@@ -125,6 +142,7 @@ const CityDetail = () => {
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterRating, setFilterRating] = useState('all');
   const [savingFavorite, setSavingFavorite] = useState(false);
+  const [planningPlaceId, setPlanningPlaceId] = useState('');
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
@@ -288,6 +306,11 @@ const CityDetail = () => {
     [attractions]
   );
 
+  const allCityPlaces = useMemo(
+    () => [...attractions].sort((left, right) => left.name.localeCompare(right.name)),
+    [attractions]
+  );
+
   const getPlaceCoordinates = (item) => {
     if (item.latitude != null && item.longitude != null) {
       return { lat: Number(item.latitude), lng: Number(item.longitude) };
@@ -408,6 +431,40 @@ const CityDetail = () => {
       toast.error(error.response?.data?.message || 'Unable to save city');
     } finally {
       setSavingFavorite(false);
+    }
+  };
+
+  const requireAuth = () => {
+    if (user) {
+      return true;
+    }
+
+    toast.info('Please log in to use planner actions');
+    navigate('/login');
+    return false;
+  };
+
+  const handlePlanPlace = async (place) => {
+    if (!place?._id) {
+      return;
+    }
+
+    if (!requireAuth()) {
+      return;
+    }
+
+    setPlanningPlaceId(place._id);
+    try {
+      const response = await api.post('/users/planned-trips/add', {
+        attractionId: place._id,
+        bookingStatus: 'saved',
+      });
+      updateUser(response.data.user);
+      toast.success(`${place.name} added to your planner`);
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Unable to add place to planner');
+    } finally {
+      setPlanningPlaceId('');
     }
   };
 
@@ -542,7 +599,7 @@ const CityDetail = () => {
       <section className="grid gap-8 xl:grid-cols-[2fr,1.2fr]" id="places">
         <div className="space-y-8">
           <div className="rounded-[32px] bg-white p-8 shadow-xl">
-            <h2 className="text-2xl font-semibold text-slate-900">Famous tourist spots</h2>
+            <h2 className="text-2xl font-semibold text-slate-900">{city.cityName}: famous tourist spots</h2>
             <p className="mt-3 text-slate-600">Enjoy the must-see attractions from this city with category and rating filters.</p>
             <div className="mt-6 flex flex-wrap gap-4">
               <select
@@ -580,6 +637,8 @@ const CityDetail = () => {
                     description={item.description}
                     distanceText={getPlaceDistance(item) != null ? formatDistance(getPlaceDistance(item)) : null}
                     showViewLink
+                    onPlan={handlePlanPlace}
+                    planLoading={planningPlaceId === item._id}
                   />
                 ))}
               </div>
@@ -589,7 +648,7 @@ const CityDetail = () => {
           </div>
 
           <div className="rounded-[32px] bg-white p-8 shadow-xl">
-            <h2 className="text-2xl font-semibold text-slate-900">Popular malls & shopping</h2>
+            <h2 className="text-2xl font-semibold text-slate-900">{city.cityName}: malls & shopping</h2>
             <p className="mt-3 text-slate-600">Find the top shopping spots, malls, and local market areas.</p>
             {pvpToBabaiDistance != null ? (
               <div className="mt-4 rounded-[20px] bg-slate-50 px-4 py-3 text-sm text-slate-700">
@@ -605,6 +664,9 @@ const CityDetail = () => {
                     subtitle={item.category}
                     description={item.description}
                     distanceText={getPlaceDistance(item) != null ? formatDistance(getPlaceDistance(item)) : null}
+                    showViewLink
+                    onPlan={handlePlanPlace}
+                    planLoading={planningPlaceId === item._id}
                   />
                 ))}
               </div>
@@ -614,7 +676,7 @@ const CityDetail = () => {
           </div>
 
           <div className="rounded-[32px] bg-white p-8 shadow-xl">
-            <h2 className="text-2xl font-semibold text-slate-900">Restaurants & dining</h2>
+            <h2 className="text-2xl font-semibold text-slate-900">{city.cityName}: restaurants & dining</h2>
             <p className="mt-3 text-slate-600">Discover local favorites and popular dining spots.</p>
             {restaurantList.length ? (
               <div className="mt-6 space-y-4">
@@ -625,11 +687,39 @@ const CityDetail = () => {
                     subtitle={item.category}
                     description={item.description}
                     distanceText={getPlaceDistance(item) != null ? formatDistance(getPlaceDistance(item)) : null}
+                    showViewLink
+                    onPlan={handlePlanPlace}
+                    planLoading={planningPlaceId === item._id}
                   />
                 ))}
               </div>
             ) : (
               <p className="mt-6 text-slate-500">No restaurants have been added for this city yet.</p>
+            )}
+          </div>
+
+          <div className="rounded-[32px] bg-white p-8 shadow-xl">
+            <h2 className="text-2xl font-semibold text-slate-900">All places in {city.cityName}</h2>
+            <p className="mt-3 text-slate-600">
+              Browse all attractions, shopping places, and restaurants tagged under this city and open any place detail directly.
+            </p>
+            {allCityPlaces.length ? (
+              <div className="mt-6 space-y-4">
+                {allCityPlaces.map((item) => (
+                  <PlaceSearchCard
+                    key={item._id}
+                    place={item}
+                    subtitle={`${item.category}${item.averageRating ? ` · ${item.averageRating}/5 rating` : ''}`}
+                    description={item.description}
+                    distanceText={getPlaceDistance(item) != null ? formatDistance(getPlaceDistance(item)) : null}
+                    showViewLink
+                    onPlan={handlePlanPlace}
+                    planLoading={planningPlaceId === item._id}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="mt-6 text-slate-500">No places are available for this city yet.</p>
             )}
           </div>
 

@@ -1,5 +1,6 @@
 const { validationResult } = require('express-validator');
 const Review = require('../models/Review');
+const { resolveUploadedImageUrl } = require('../utils/resolveUploadedImageUrl');
 
 const getReviewsForAttraction = async (req, res) => {
   try {
@@ -16,8 +17,8 @@ const addReview = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
   const { attractionId, rating, comment } = req.body;
-  const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
   try {
+    const imageUrl = req.file ? await resolveUploadedImageUrl(req.file) : null;
     const review = await Review.create({
       attractionId,
       userId: req.user._id,

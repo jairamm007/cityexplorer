@@ -10,7 +10,10 @@
     "seed:featured": "node scripts/upsertFeaturedCities.js",
     "seed:india": "node scripts/seedIndianCities.js",
     "seed:focus": "node scripts/focusCityDataset.js",
-    "seed:admin": "node scripts/createAdmin.js"
+    "seed:admin": "node scripts/createAdmin.js",
+    "images:normalize": "node scripts/normalizeImageUrls.js",
+    "images:apply-city-posters": "node scripts/applyCityPosterImages.js",
+    "users:backfill-name-keys": "node scripts/backfillUserNameKeys.js"
   },
   "keywords": [
     "mern",
@@ -23,6 +26,7 @@
   "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "cloudinary": "^2.10.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",

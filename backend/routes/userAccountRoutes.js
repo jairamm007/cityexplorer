@@ -13,6 +13,7 @@ const {
   removePlannedTrip,
   deleteUserAccount,
 } = require('../controllers/userProfileController');
+const { checkProfileNameAvailability } = require('../controllers/userAuthController');
 const { protect } = require('../middleware/userAuthMiddleware');
 const upload = require('../middleware/uploadMiddleware');
 
@@ -20,6 +21,7 @@ const router = express.Router();
 
 // Get user profile
 router.get('/profile', protect, getUserProfile);
+router.get('/profile-name-status', protect, checkProfileNameAvailability);
 
 // Update user profile
 router.put(

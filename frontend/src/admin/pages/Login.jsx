@@ -8,7 +8,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAdminAuth();
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [form, setForm] = useState({ identifier: '', password: '' });
   const [loading, setLoading] = useState(false);
 
   const handleChange = (event) => {
@@ -60,12 +60,13 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-5">
           <label className="block">
-            <span className="text-sm font-semibold text-slate-700">Email</span>
+            <span className="text-sm font-semibold text-slate-700">Email or Profile Name</span>
             <input
-              name="email"
-              type="email"
-              value={form.email}
+              name="identifier"
+              type="text"
+              value={form.identifier}
               onChange={handleChange}
+              placeholder="admin@example.com or profile name"
               className="mt-2 w-full rounded-[28px] border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-slate-900"
               required
             />

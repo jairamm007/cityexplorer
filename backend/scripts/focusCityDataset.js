@@ -9,15 +9,15 @@ const User = require('../models/User');
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 const cityImage = {
-  Mumbai: 'https://images.unsplash.com/photo-1526481280695-3c4691c04682?auto=format&fit=crop&w=1200&q=80',
-  Kolkata: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1200&q=80',
-  Delhi: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1200&q=80',
-  Chennai: 'https://images.unsplash.com/photo-1566552881560-0be862a7c445?auto=format&fit=crop&w=1200&q=80',
-  Bangalore: 'https://images.unsplash.com/photo-1596176530529-78163a4f7af2?auto=format&fit=crop&w=1200&q=80',
-  Hyderabad: 'https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=1200&q=80',
-  Vijayawada: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80',
-  Mangalagiri: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1200&q=80',
-  Vizag: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
+  Mumbai: '/uploads/images/city-mumbai.jpeg',
+  Kolkata: '/uploads/images/city-kolkata.jpeg',
+  Delhi: '/uploads/images/city-delhi.jpeg',
+  Chennai: '/uploads/images/city-chennai.jpeg',
+  Bangalore: '/uploads/images/city-bangalore.jpeg',
+  Hyderabad: '/uploads/images/city-hyderabad.jpeg',
+  Vijayawada: '/uploads/images/city-vijayawada.jpeg',
+  Mangalagiri: '/uploads/images/city-mangalagiri.jpeg',
+  Vizag: '/uploads/images/city-vizag.jpeg',
 };
 
 const targetCities = [

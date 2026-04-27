@@ -34,13 +34,53 @@ export const resolveImageUrl = (value) => {
     return '';
   }
 
-  if (/^https?:\/\//i.test(value) || value.startsWith('data:') || value.startsWith('blob:')) {
-    return value;
+  const normalized = String(value).trim().replace(/\\/g, '/');
+
+  if (!normalized) {
+    return '';
   }
 
-  if (value.startsWith('/')) {
-    return `${getApiOrigin()}${value}`;
+  if (normalized.startsWith('data:') || normalized.startsWith('blob:')) {
+    return normalized;
   }
 
-  return value;
+  if (/^https?:\/\//i.test(normalized)) {
+    try {
+      const parsed = new URL(normalized);
+      if (/^(localhost|127\.0\.0\.1)$/i.test(parsed.hostname) && parsed.pathname.startsWith('/uploads/')) {
+        return `${getApiOrigin()}${parsed.pathname}`;
+      }
+    } catch (error) {
+      return normalized;
+    }
+
+    return normalized;
+  }
+
+  if (normalized.startsWith('/uploads/')) {
+    return `${getApiOrigin()}${normalized}`;
+  }
+
+  if (normalized.startsWith('uploads/')) {
+    return `${getApiOrigin()}/${normalized}`;
+  }
+
+  if (normalized.startsWith('/')) {
+    return `${getApiOrigin()}${normalized}`;
+  }
+
+  return normalized;
+};
+
+export const resolveImageProxyUrl = (value) => {
+  const normalized = resolveImageUrl(value);
+  if (!normalized) {
+    return '';
+  }
+
+  if (/^https?:\/\//i.test(normalized)) {
+    return `${apiBaseUrl}/utils/image-proxy?url=${encodeURIComponent(normalized)}`;
+  }
+
+  return normalized;
 };

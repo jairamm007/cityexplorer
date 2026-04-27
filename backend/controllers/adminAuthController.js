@@ -4,6 +4,9 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const City = require('../models/City');
 const Attraction = require('../models/Attraction');
+const { resolveUploadedImageUrl } = require('../utils/resolveUploadedImageUrl');
+const { generateProfileNameSuggestions } = require('../utils/profileNameSuggestions');
+const { isProfileNameTaken, normalizeProfileName, toProfileNameKey } = require('../utils/profileName');
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES || '7d' });
@@ -52,18 +55,6 @@ const serializeAdminUser = (user) => ({
   createdAt: user.createdAt,
 });
 
-const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-const isDuplicateProfileName = async (name, userId) => {
-  const normalizedName = name.trim();
-  const existingUser = await User.findOne({
-    _id: { $ne: userId },
-    name: { $regex: `^${escapeRegExp(normalizedName)}$`, $options: 'i' },
-  });
-
-  return Boolean(existingUser);
-};
-
 const adminLogin = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -73,13 +64,17 @@ const adminLogin = async (req, res) => {
     });
   }
 
-  const { email, password } = req.body;
-  const normalizedEmail = email.trim().toLowerCase();
+  const { identifier, password } = req.body;
+  const normalizedIdentifier = normalizeProfileName(identifier);
+  const normalizedEmail = normalizedIdentifier.toLowerCase();
+  const normalizedNameKey = toProfileNameKey(normalizedIdentifier);
   const bootstrapEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
   const bootstrapPassword = process.env.ADMIN_PASSWORD;
 
   try {
-    const user = await User.findOne({ email: normalizedEmail });
+    const user = await User.findOne({
+      $or: [{ email: normalizedEmail }, { nameKey: normalizedNameKey }],
+    });
     if (user && user.role === 'admin' && user.password) {
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
@@ -133,10 +128,14 @@ const updateAdminProfile = async (req, res) => {
     }
 
     if (name !== undefined) {
-      const trimmedName = name.trim();
+      const trimmedName = normalizeProfileName(name);
 
-      if (await isDuplicateProfileName(trimmedName, req.user.id)) {
-        return res.status(400).json({ message: 'Profile name already taken, use another one' });
+      if (await isProfileNameTaken(trimmedName, req.user.id)) {
+        const suggestions = await generateProfileNameSuggestions(trimmedName);
+        return res.status(400).json({
+          message: 'Profile name already taken, use another one',
+          suggestions,
+        });
       }
 
       user.name = trimmedName;
@@ -168,7 +167,8 @@ const uploadAdminProfileImage = async (req, res) => {
       return res.status(404).json({ message: 'Admin user not found' });
     }
 
-    user.profileImage = `/uploads/images/${req.file.filename}`;
+    const uploadedUrl = await resolveUploadedImageUrl(req.file);
+    user.profileImage = uploadedUrl || user.profileImage;
     await user.save();
 
     res.json({

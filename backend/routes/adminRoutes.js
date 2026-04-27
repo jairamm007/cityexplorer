@@ -8,6 +8,7 @@ const {
   updateAdminPassword,
   getAdminOverview,
 } = require('../controllers/adminAuthController');
+const { checkProfileNameAvailability } = require('../controllers/userAuthController');
 const { getUsers, updateUserRole, deleteUser } = require('../controllers/adminUserController');
 const { protect } = require('../middleware/userAuthMiddleware');
 const { requireAdmin } = require('../middleware/adminMiddleware');
@@ -18,12 +19,13 @@ const router = express.Router();
 router.post(
   '/auth/login',
   [
-    body('email').trim().isEmail().withMessage('Valid email is required'),
+    body('identifier').trim().notEmpty().withMessage('Email or profile name is required'),
     body('password').notEmpty().withMessage('Password is required'),
   ],
   adminLogin
 );
 
+router.get('/auth/profile-name-status', protect, requireAdmin, checkProfileNameAvailability);
 router.get('/auth/profile', protect, requireAdmin, getAdminProfile);
 router.put(
   '/auth/profile',

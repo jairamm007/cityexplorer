@@ -39,13 +39,13 @@ const Dashboard = () => {
   const [placesOpen, setPlacesOpen] = useState(true);
 
   const currentView = useMemo(() => {
-    if (location.pathname === '/cities') {
+    if (location.pathname.startsWith('/admin/cities')) {
       return 'cities';
     }
-    if (location.pathname === '/places') {
+    if (location.pathname.startsWith('/admin/places')) {
       return 'places';
     }
-    if (location.pathname === '/users') {
+    if (location.pathname.startsWith('/admin/users')) {
       return 'users';
     }
     return 'all';
@@ -229,15 +229,33 @@ const Dashboard = () => {
 
   const jumpToSection = (sectionId) => {
     if (sectionId === 'cities') {
-      navigate('/admin/cities');
+      navigate('/admin/cities#cities');
+      requestAnimationFrame(() => {
+        const element = document.getElementById('cities');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
       return;
     }
     if (sectionId === 'places') {
-      navigate('/admin/places');
+      navigate('/admin/places#places');
+      requestAnimationFrame(() => {
+        const element = document.getElementById('places');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
       return;
     }
     if (sectionId === 'users') {
-      navigate('/admin/users');
+      navigate('/admin/users#users');
+      requestAnimationFrame(() => {
+        const element = document.getElementById('users');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
       return;
     }
 

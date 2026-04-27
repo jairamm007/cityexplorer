@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import AuthShell from '../components/UserAuthShell';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ const Login = () => {
     event.preventDefault();
     setLoading(true);
     try {
-      const response = await api.post('/auth/login', { email, password });
+      const response = await api.post('/auth/login', { identifier, password });
       login(response.data.user, response.data.token);
       toast.success('Login successful');
       navigate(location.state?.from || '/dashboard');
@@ -61,12 +61,13 @@ const Login = () => {
       </div>
       <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         <label className="block">
-          <span className="text-sm font-medium text-slate-700">Email</span>
+          <span className="text-sm font-medium text-slate-700">Email or Profile Name</span>
           <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
             required
+            placeholder="you@example.com or your profile name"
             className="mt-2 w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-slate-900"
           />
         </label>

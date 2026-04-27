@@ -2,6 +2,9 @@ const User = require('../models/User');
 const Attraction = require('../models/Attraction');
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
+const { resolveUploadedImageUrl } = require('../utils/resolveUploadedImageUrl');
+const { generateProfileNameSuggestions } = require('../utils/profileNameSuggestions');
+const { isProfileNameTaken, normalizeProfileName } = require('../utils/profileName');
 
 const populatedUserQuery = (userId) =>
   User.findById(userId)
@@ -23,18 +26,6 @@ const populatedUserQuery = (userId) =>
         select: 'cityName country',
       },
     });
-
-const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-const isDuplicateProfileName = async (name, userId) => {
-  const normalizedName = name.trim();
-  const existingUser = await User.findOne({
-    _id: { $ne: userId },
-    name: { $regex: `^${escapeRegExp(normalizedName)}$`, $options: 'i' },
-  });
-
-  return Boolean(existingUser);
-};
 
 // Get user profile
 const getUserProfile = async (req, res) => {
@@ -67,10 +58,14 @@ const updateUserProfile = async (req, res) => {
     }
 
     if (name !== undefined) {
-      const trimmedName = name.trim();
+      const trimmedName = normalizeProfileName(name);
 
-      if (await isDuplicateProfileName(trimmedName, req.user.id)) {
-        return res.status(400).json({ message: 'Profile name already taken, use another one' });
+      if (await isProfileNameTaken(trimmedName, req.user.id)) {
+        const suggestions = await generateProfileNameSuggestions(trimmedName);
+        return res.status(400).json({
+          message: 'Profile name already taken, use another one',
+          suggestions,
+        });
       }
 
       user.name = trimmedName;
@@ -183,7 +178,8 @@ const uploadProfileImage = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    user.profileImage = `/uploads/images/${req.file.filename}`;
+    const uploadedUrl = await resolveUploadedImageUrl(req.file);
+    user.profileImage = uploadedUrl || user.profileImage;
     await user.save();
 
     const updatedUser = await populatedUserQuery(req.user.id);

@@ -3,22 +3,13 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 const User = require('../models/User');
+const { generateProfileNameSuggestions } = require('../utils/profileNameSuggestions');
+const { isProfileNameTaken, normalizeProfileName, toProfileNameKey } = require('../utils/profileName');
 
 const googleClient = process.env.GOOGLE_CLIENT_ID ? new OAuth2Client(process.env.GOOGLE_CLIENT_ID) : null;
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES || '7d' });
-};
-
-const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-const hasDuplicateName = async (name) => {
-  const normalizedName = name.trim();
-  const existingUser = await User.findOne({
-    name: { $regex: `^${escapeRegExp(normalizedName)}$`, $options: 'i' },
-  });
-
-  return Boolean(existingUser);
 };
 
 const serializeUser = (user) => ({
@@ -47,7 +38,7 @@ const registerUser = async (req, res) => {
 
   const { name, email, password } = req.body;
   const normalizedEmail = email.trim().toLowerCase();
-  const normalizedName = name.trim();
+  const normalizedName = normalizeProfileName(name);
 
   try {
     const existingUser = await User.findOne({ email: normalizedEmail });
@@ -55,8 +46,12 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ message: 'Email already registered' });
     }
 
-    if (await hasDuplicateName(normalizedName)) {
-      return res.status(400).json({ message: 'Profile name already taken, use another one' });
+    if (await isProfileNameTaken(normalizedName)) {
+      const suggestions = await generateProfileNameSuggestions(normalizedName);
+      return res.status(400).json({
+        message: 'Profile name already taken, use another one',
+        suggestions,
+      });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -89,10 +84,14 @@ const loginUser = async (req, res) => {
     });
   }
 
-  const { email, password } = req.body;
-  const normalizedEmail = email.trim().toLowerCase();
+  const { identifier, password } = req.body;
+  const normalizedIdentifier = normalizeProfileName(identifier);
+  const normalizedEmail = normalizedIdentifier.toLowerCase();
+  const normalizedNameKey = toProfileNameKey(normalizedIdentifier);
   try {
-    const user = await User.findOne({ email: normalizedEmail });
+    const user = await User.findOne({
+      $or: [{ email: normalizedEmail }, { nameKey: normalizedNameKey }],
+    });
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -146,12 +145,12 @@ const googleSignIn = async (req, res) => {
     let user = await User.findOne({ email: normalizedEmail });
 
     if (!user) {
-      const duplicateName = await User.findOne({
-        name: { $regex: `^${escapeRegExp(requestedName.trim())}$`, $options: 'i' },
-      });
-
-      if (duplicateName) {
-        return res.status(400).json({ message: 'Profile name already taken, use another one' });
+      if (await isProfileNameTaken(requestedName)) {
+        const suggestions = await generateProfileNameSuggestions(requestedName);
+        return res.status(400).json({
+          message: 'Profile name already taken, use another one',
+          suggestions,
+        });
       }
 
       user = await User.create({
@@ -184,6 +183,28 @@ const googleSignIn = async (req, res) => {
   }
 };
 
+const checkProfileNameAvailability = async (req, res) => {
+  const requestedName = normalizeProfileName(req.query.name);
+  const excludeUserId = req.user?.id || req.user?._id || null;
+
+  if (!requestedName) {
+    return res.status(400).json({ message: 'Profile name is required' });
+  }
+
+  try {
+    const taken = await isProfileNameTaken(requestedName, excludeUserId);
+    const suggestions = taken ? await generateProfileNameSuggestions(requestedName) : [];
+
+    res.json({
+      available: !taken,
+      name: requestedName,
+      suggestions,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Unable to check profile name' });
+  }
+};
+
 const getProfile = (req, res) => {
   if (!req.user) {
     return res.status(401).json({ message: 'Not authorized' });
@@ -191,4 +212,4 @@ const getProfile = (req, res) => {
   res.json({ user: req.user });
 };
 
-module.exports = { registerUser, loginUser, googleSignIn, getProfile };
+module.exports = { registerUser, loginUser, googleSignIn, checkProfileNameAvailability, getProfile };

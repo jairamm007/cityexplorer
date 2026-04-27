@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { normalizePersistedImageUrl } = require('../utils/imageUrl');
 
 const reviewSchema = new mongoose.Schema(
   {
@@ -13,5 +14,12 @@ const reviewSchema = new mongoose.Schema(
 
 reviewSchema.index({ attractionId: 1, createdAt: -1 });
 reviewSchema.index({ userId: 1 });
+reviewSchema.pre('validate', function normalizeImage(next) {
+  if (typeof this.imageUrl === 'string') {
+    this.imageUrl = normalizePersistedImageUrl(this.imageUrl);
+  }
+
+  next();
+});
 
 module.exports = mongoose.model('Review', reviewSchema);

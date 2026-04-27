@@ -1,5 +1,7 @@
 const { validationResult } = require('express-validator');
 const City = require('../models/City');
+const { resolveUploadedImageUrl } = require('../utils/resolveUploadedImageUrl');
+const { normalizePersistedImageUrl } = require('../utils/imageUrl');
 
 const CREATED_BY_FIELDS = 'name email';
 
@@ -11,14 +13,14 @@ const normalizeNumber = (value) => {
   return Number.isNaN(parsed) ? undefined : parsed;
 };
 
-const resolveImageUrl = (req, existingImageUrl) => {
+const resolveImageUrl = async (req, existingImageUrl) => {
   if (req.file) {
-    return `/uploads/images/${req.file.filename}`;
+    const uploadedUrl = await resolveUploadedImageUrl(req.file);
+    return uploadedUrl || existingImageUrl;
   }
 
   if (typeof req.body.imageUrl === 'string') {
-    const trimmed = req.body.imageUrl.trim();
-    return trimmed;
+    return normalizePersistedImageUrl(req.body.imageUrl);
   }
 
   return existingImageUrl;
@@ -114,7 +116,7 @@ const createCity = async (req, res) => {
         state,
         location,
         description,
-        imageUrl: resolveImageUrl(req, undefined),
+        imageUrl: await resolveImageUrl(req, undefined),
         latitude,
         longitude,
       }),
@@ -146,7 +148,7 @@ const updateCity = async (req, res) => {
       city,
       buildCityPayload({
         ...req.body,
-        imageUrl: resolveImageUrl(req, city.imageUrl),
+        imageUrl: await resolveImageUrl(req, city.imageUrl),
       })
     );
     await city.save();
