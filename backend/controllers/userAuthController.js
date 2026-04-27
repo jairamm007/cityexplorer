@@ -8,6 +8,8 @@ const { generateToken } = require('../utils/jwt');
 
 const googleClient = process.env.GOOGLE_CLIENT_ID ? new OAuth2Client(process.env.GOOGLE_CLIENT_ID) : null;
 
+const isLocalPlaceholderGoogleId = (value) => typeof value === 'string' && value.startsWith('local:');
+
 const serializeUser = (user) => ({
   id: user._id,
   name: user.name,
@@ -80,6 +82,10 @@ const registerUser = async (req, res) => {
           message: 'Profile name already taken, use another one',
           suggestions,
         });
+      }
+
+      if (error.keyPattern?.googleId) {
+        return res.status(400).json({ message: 'Account identity conflict. Please try again.' });
       }
     }
 
@@ -174,7 +180,7 @@ const googleSignIn = async (req, res) => {
         profileImage: payload.picture,
       });
     } else {
-      user.googleId = user.googleId || payload.sub;
+      user.googleId = !user.googleId || isLocalPlaceholderGoogleId(user.googleId) ? payload.sub : user.googleId;
       user.authProvider = user.authProvider === 'local' && user.password ? 'local' : 'google';
       user.isVerified = true;
       if (!user.profileImage && payload.picture) {

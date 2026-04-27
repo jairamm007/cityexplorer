@@ -1,21 +1,28 @@
 const hostedApiFallback = 'https://cityexplorer-backend.onrender.com/api';
+const hostedApiHost = new URL(hostedApiFallback).hostname;
 
 const resolveProductionApiBaseUrl = () => {
   const configuredApiUrl = String(import.meta.env.VITE_API_URL || '').trim();
-  if (configuredApiUrl) {
-    return configuredApiUrl;
-  }
-
   if (typeof window !== 'undefined') {
     const hostname = String(window.location.hostname || '').toLowerCase();
 
     // If frontend is served from the backend host itself, keep same-origin API calls.
-    if (hostname.endsWith('onrender.com')) {
+    if (hostname === hostedApiHost) {
       return '/api';
     }
+
+    if (configuredApiUrl && configuredApiUrl !== '/api') {
+      return configuredApiUrl;
+    }
+
+    // Static/mobile clients hosted away from the backend need the public API host.
+    return hostedApiFallback;
   }
 
-  // For static hosting (Netlify/custom domains), default to hosted backend.
+  if (configuredApiUrl && configuredApiUrl !== '/api') {
+    return configuredApiUrl;
+  }
+
   return hostedApiFallback;
 };
 

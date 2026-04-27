@@ -58,6 +58,10 @@ userSchema.pre('validate', function setNameKey(next) {
     this.nameKey = toProfileNameKey(this.name);
   }
 
+  if (this.authProvider !== 'google' && !this.googleId) {
+    this.googleId = `local:${this._id}`;
+  }
+
   if (typeof this.profileImage === 'string') {
     this.profileImage = normalizePersistedImageUrl(this.profileImage);
   }
