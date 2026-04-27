@@ -1,16 +1,12 @@
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const City = require('../models/City');
 const Attraction = require('../models/Attraction');
 const { resolveUploadedImageUrl } = require('../utils/resolveUploadedImageUrl');
 const { generateProfileNameSuggestions } = require('../utils/profileNameSuggestions');
 const { isProfileNameTaken, normalizeProfileName, toProfileNameKey } = require('../utils/profileName');
-
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES || '7d' });
-};
+const { generateToken } = require('../utils/jwt');
 
 const bootstrapAdmin = async () => {
   const adminName = process.env.ADMIN_NAME;

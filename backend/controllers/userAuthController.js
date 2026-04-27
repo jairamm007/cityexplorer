@@ -1,16 +1,12 @@
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 const User = require('../models/User');
 const { generateProfileNameSuggestions } = require('../utils/profileNameSuggestions');
 const { isProfileNameTaken, normalizeProfileName, toProfileNameKey } = require('../utils/profileName');
+const { generateToken } = require('../utils/jwt');
 
 const googleClient = process.env.GOOGLE_CLIENT_ID ? new OAuth2Client(process.env.GOOGLE_CLIENT_ID) : null;
-
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES || '7d' });
-};
 
 const serializeUser = (user) => ({
   id: user._id,
@@ -71,7 +67,23 @@ const registerUser = async (req, res) => {
       token: generateToken(user._id),
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error during registration' });
+    console.error('Registration failed:', error.message);
+
+    if (error.code === 11000) {
+      if (error.keyPattern?.email) {
+        return res.status(400).json({ message: 'Email already registered' });
+      }
+
+      if (error.keyPattern?.nameKey) {
+        const suggestions = await generateProfileNameSuggestions(normalizedName);
+        return res.status(400).json({
+          message: 'Profile name already taken, use another one',
+          suggestions,
+        });
+      }
+    }
+
+    res.status(500).json({ message: 'Unable to create account. Please try again.' });
   }
 };
 
