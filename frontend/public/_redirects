@@ -1,8 +1,1 @@
-/*    /index.html   200
-
-# Vercel rewrite for SPA single-page app (keeps client-side routing working)
-# Netlify-style _redirects already present; Vercel uses vercel.json or headers
-# but adding this comment for clarity. For Vercel, ensure `vercel.json` contains:
-# {
-#   "rewrites": [ { "source": "/*", "destination": "/index.html" } ]
-# }
+/* /index.html 200
