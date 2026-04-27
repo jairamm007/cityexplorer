@@ -380,7 +380,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className={`overflow-hidden transition-all duration-300 ${citiesOpen ? 'mt-6 max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+        <div className={`overflow-hidden transition-all duration-300 ${citiesOpen ? 'mt-6 opacity-100' : 'max-h-0 opacity-0'}`}>
           {filteredCities.length ? (
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               {filteredCities.map((city) => (
@@ -443,7 +443,7 @@ const Dashboard = () => {
           </div>
         ) : null}
 
-        <div className={`overflow-hidden transition-all duration-300 ${placesOpen ? 'mt-6 max-h-[6000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+        <div className={`overflow-hidden transition-all duration-300 ${placesOpen ? 'mt-6 opacity-100' : 'max-h-0 opacity-0'}`}>
           {filteredPlaces.length ? (
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               {filteredPlaces.map((attraction) => (
