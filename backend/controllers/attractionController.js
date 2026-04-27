@@ -1,8 +1,10 @@
 const { validationResult } = require('express-validator');
+const City = require('../models/City');
 const Attraction = require('../models/Attraction');
 const Review = require('../models/Review');
 const { resolveUploadedImageUrl } = require('../utils/resolveUploadedImageUrl');
 const { normalizePersistedImageUrl } = require('../utils/imageUrl');
+const { ALLOWED_CITY_NAMES, isAllowedCityName } = require('../utils/allowedCities');
 
 const CREATED_BY_FIELDS = 'name email';
 
@@ -54,6 +56,28 @@ const parseLimit = (value, max = 200) => {
   return Math.min(parsed, max);
 };
 
+const getAllowedCityIds = async () => {
+  const cities = await City.find({ cityName: { $in: ALLOWED_CITY_NAMES } }).select('_id').lean();
+  return cities.map((city) => city._id);
+};
+
+const getAllowedCityById = async (cityId) => {
+  if (!cityId) {
+    return null;
+  }
+
+  try {
+    const city = await City.findById(cityId).select('_id cityName').lean();
+    if (!city || !isAllowedCityName(city.cityName)) {
+      return null;
+    }
+
+    return city;
+  } catch (error) {
+    return null;
+  }
+};
+
 const attachReviewStats = async (attractions) => {
   if (!attractions.length) {
     return attractions;
@@ -95,9 +119,22 @@ const getAttractions = async (req, res) => {
     const query = {};
     const limit = parseLimit(req.query.limit);
     const includeOwner = req.query.includeOwner !== 'false';
-    if (req.query.cityId) {
-      query.cityId = req.query.cityId;
+    const allowedCityIds = await getAllowedCityIds();
+
+    if (!allowedCityIds.length) {
+      return res.json([]);
     }
+
+    if (req.query.cityId) {
+      const selectedCity = await getAllowedCityById(req.query.cityId);
+      if (!selectedCity) {
+        return res.json([]);
+      }
+      query.cityId = req.query.cityId;
+    } else {
+      query.cityId = { $in: allowedCityIds };
+    }
+
     if (req.query.q) {
       const search = req.query.q.trim();
       query.$or = [
@@ -135,7 +172,7 @@ const getAttractionById = async (req, res) => {
     const attraction = await Attraction.findById(req.params.id)
       .populate('cityId', 'cityName country state latitude longitude')
       .populate('createdBy', CREATED_BY_FIELDS);
-    if (!attraction) {
+    if (!attraction || !isAllowedCityName(attraction.cityId?.cityName)) {
       return res.status(404).json({ message: 'Attraction not found' });
     }
     const [enrichedAttraction] = await attachReviewStats([attraction]);
@@ -164,6 +201,11 @@ const createAttraction = async (req, res) => {
     bestTimeToVisit,
     travelTips,
   } = req.body;
+
+  const allowedCity = await getAllowedCityById(cityId);
+  if (!allowedCity) {
+    return res.status(400).json({ message: `Places are limited to cities in this set: ${ALLOWED_CITY_NAMES.join(', ')}` });
+  }
 
   try {
     const attraction = await Attraction.create({
@@ -206,6 +248,11 @@ const updateAttraction = async (req, res) => {
     }
     if (!canManageAttraction(attraction, req.user)) {
       return res.status(403).json({ message: 'You can only edit places added by you' });
+    }
+
+    const allowedCity = await getAllowedCityById(req.body.cityId);
+    if (!allowedCity) {
+      return res.status(400).json({ message: `Places are limited to cities in this set: ${ALLOWED_CITY_NAMES.join(', ')}` });
     }
 
     Object.assign(

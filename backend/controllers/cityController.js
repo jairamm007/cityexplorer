@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator');
 const City = require('../models/City');
 const { resolveUploadedImageUrl } = require('../utils/resolveUploadedImageUrl');
 const { normalizePersistedImageUrl } = require('../utils/imageUrl');
+const { ALLOWED_CITY_NAMES, getAllowedCityQuery, isAllowedCityName } = require('../utils/allowedCities');
 
 const CREATED_BY_FIELDS = 'name email';
 
@@ -54,14 +55,18 @@ const getCities = async (req, res) => {
     const search = req.query.q ? req.query.q.trim() : '';
     const limit = parseLimit(req.query.limit);
     const includeOwner = req.query.includeOwner !== 'false';
-    const query = search
-      ? {
-          $or: [
-            { cityName: { $regex: search, $options: 'i' } },
-            { country: { $regex: search, $options: 'i' } },
-          ],
-        }
-      : {};
+    const queryParts = [getAllowedCityQuery()];
+
+    if (search) {
+      queryParts.push({
+        $or: [
+          { cityName: { $regex: search, $options: 'i' } },
+          { country: { $regex: search, $options: 'i' } },
+        ],
+      });
+    }
+
+    const query = queryParts.length > 1 ? { $and: queryParts } : queryParts[0];
 
     let citiesQuery = City.find(query).sort({ createdAt: -1 });
 
@@ -83,7 +88,7 @@ const getCities = async (req, res) => {
 const getCityById = async (req, res) => {
   try {
     const city = await City.findById(req.params.id).populate('createdBy', CREATED_BY_FIELDS);
-    if (!city) {
+    if (!city || !isAllowedCityName(city.cityName)) {
       return res.status(404).json({ message: 'City not found' });
     }
     res.json(city);
@@ -107,6 +112,10 @@ const createCity = async (req, res) => {
     latitude,
     longitude,
   } = req.body;
+
+  if (!isAllowedCityName(cityName)) {
+    return res.status(400).json({ message: `Cities are limited to: ${ALLOWED_CITY_NAMES.join(', ')}` });
+  }
 
   try {
     const city = await City.create({
@@ -133,6 +142,10 @@ const updateCity = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
+  }
+
+  if (!isAllowedCityName(req.body.cityName)) {
+    return res.status(400).json({ message: `Cities are limited to: ${ALLOWED_CITY_NAMES.join(', ')}` });
   }
 
   try {

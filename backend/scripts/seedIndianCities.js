@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const connectDB = require('../config/db');
 const City = require('../models/City');
 const Attraction = require('../models/Attraction');
+const { ALLOWED_CITY_NAMES } = require('../utils/allowedCities');
 
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
@@ -559,16 +560,18 @@ const seedIndianCities = async () => {
   try {
     await connectDB();
 
+    const focusedCityData = cityData.filter((item) => ALLOWED_CITY_NAMES.includes(item.city.cityName));
+
     await Attraction.deleteMany({});
     await City.deleteMany({});
 
-    const createdCities = await City.insertMany(cityData.map((item) => item.city));
+    const createdCities = await City.insertMany(focusedCityData.map((item) => item.city));
     const cityMap = createdCities.reduce((acc, city) => {
       acc[city.cityName] = city._id;
       return acc;
     }, {});
 
-    const attractionDocs = cityData.flatMap((item) =>
+    const attractionDocs = focusedCityData.flatMap((item) =>
       item.places.map((place) => toAttractionDoc(cityMap, item.city.cityName, place))
     );
 
