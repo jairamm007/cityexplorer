@@ -30,6 +30,8 @@ const apiBaseUrl = import.meta.env.DEV
   ? '/api'
   : resolveProductionApiBaseUrl();
 
+const bareImageIdPattern = /^[a-f0-9]{24}$/i;
+
 export const getApiOrigin = () => {
   if (apiBaseUrl.startsWith('/')) {
     return window.location.origin;
@@ -57,14 +59,23 @@ export const resolveImageUrl = (value) => {
     return normalized;
   }
 
+  if (bareImageIdPattern.test(normalized)) {
+    return `${getApiOrigin()}/api/images/${normalized}`;
+  }
+
   if (/^https?:\/\//i.test(normalized)) {
     try {
       const parsed = new URL(normalized);
-      if (
-        /^(localhost|127\.0\.0\.1)$/i.test(parsed.hostname) &&
-        (parsed.pathname.startsWith('/uploads/') || parsed.pathname.startsWith('/api/images/'))
-      ) {
-        return `${getApiOrigin()}${parsed.pathname}`;
+      if (parsed.pathname.startsWith('/uploads/') || parsed.pathname.startsWith('/api/images/')) {
+        if (/^(localhost|127\.0\.0\.1)$/i.test(parsed.hostname)) {
+          return `${getApiOrigin()}${parsed.pathname}`;
+        }
+
+        return normalized;
+      }
+
+      if (parsed.pathname.startsWith('/images/')) {
+        return `${getApiOrigin()}/api${parsed.pathname}`;
       }
     } catch (error) {
       return normalized;
@@ -81,12 +92,20 @@ export const resolveImageUrl = (value) => {
     return `${getApiOrigin()}${normalized}`;
   }
 
+  if (normalized.startsWith('/images/')) {
+    return `${getApiOrigin()}/api${normalized}`;
+  }
+
   if (normalized.startsWith('uploads/')) {
     return `${getApiOrigin()}/${normalized}`;
   }
 
   if (normalized.startsWith('api/images/')) {
     return `${getApiOrigin()}/${normalized}`;
+  }
+
+  if (normalized.startsWith('images/')) {
+    return `${getApiOrigin()}/api/${normalized}`;
   }
 
   if (normalized.startsWith('/')) {
