@@ -13,6 +13,7 @@
     "seed:admin": "node scripts/createAdmin.js",
     "images:normalize": "node scripts/normalizeImageUrls.js",
     "images:apply-city-posters": "node scripts/applyCityPosterImages.js",
+    "images:apply-hyderabad-attractions": "node scripts/applyHyderabadAttractionImages.js",
     "users:backfill-name-keys": "node scripts/backfillUserNameKeys.js"
   },
   "keywords": [

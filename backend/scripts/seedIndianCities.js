@@ -8,6 +8,11 @@ dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 const landmarkImage = 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1200&q=80';
 const shoppingImage = 'https://images.unsplash.com/photo-1481437156560-3205f6a55735?auto=format&fit=crop&w=1200&q=80';
+const inorbitMallImage = '/uploads/images/attraction-inorbit-mall-hyderabad.png';
+const charminarImage = '/uploads/images/attraction-charminar.png';
+const mtrBengaluruImage = '/uploads/images/attraction-mtr-bengaluru.png';
+const orionMallImage = '/uploads/images/attraction-orion-mall.png';
+const pvpSquareMallImage = '/uploads/images/attraction-pvp-square-mall.png';
 const foodImage = 'https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1200&q=80';
 const cityImages = {
   Vijayawada: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80',
@@ -55,7 +60,7 @@ const cityData = [
     },
     places: [
       ['Kanaka Durga Temple', 'Temple', 'Indrakeeladri Hill, Vijayawada', 'A revered hilltop temple and one of the city’s biggest spiritual landmarks.', landmarkImage],
-      ['PVP Square Mall', 'Mall', 'MG Road, Labbipet, Vijayawada', 'A central shopping and entertainment mall with cinemas, stores, and food outlets.', shoppingImage],
+      ['PVP Square Mall', 'Mall', 'MG Road, Labbipet, Vijayawada', 'A central shopping and entertainment mall with cinemas, stores, and food outlets.', pvpSquareMallImage],
       ['Babai Hotel', 'Restaurant', 'Governor Peta, Vijayawada', 'A classic Vijayawada restaurant loved for Andhra breakfasts and comfort meals.', foodImage],
     ],
   },
@@ -225,8 +230,8 @@ const cityData = [
     },
     places: [
       ['Lalbagh Botanical Garden', 'Garden', 'Bengaluru, Karnataka', 'A landmark green space and one of Bengaluru’s best-known attractions.', landmarkImage],
-      ['Orion Mall', 'Mall', 'Rajajinagar, Bengaluru', 'A major mall with retail, food, and waterfront surroundings.', shoppingImage],
-      ['MTR', 'Restaurant', 'Lalbagh Road, Bengaluru', 'An iconic Bengaluru restaurant for South Indian breakfasts and meals.', foodImage],
+      ['Orion Mall', 'Mall', 'Rajajinagar, Bengaluru', 'A major mall with retail, food, and waterfront surroundings.', orionMallImage],
+      ['MTR', 'Restaurant', 'Lalbagh Road, Bengaluru', 'An iconic Bengaluru restaurant for South Indian breakfasts and meals.', mtrBengaluruImage],
     ],
   },
   {
@@ -445,8 +450,8 @@ const cityData = [
       longitude: 78.4867,
     },
     places: [
-      ['Charminar', 'Landmark', 'Hyderabad, Telangana', 'The city’s most iconic monument and a centerpiece of old Hyderabad.', landmarkImage],
-      ['Inorbit Mall', 'Mall', 'Hitec City, Hyderabad', 'A popular mall for modern shopping, movies, and dining.', shoppingImage],
+      ['Charminar', 'Landmark', 'Hyderabad, Telangana', 'The city’s most iconic monument and a centerpiece of old Hyderabad.', charminarImage],
+      ['Inorbit Mall', 'Mall', 'Hitec City, Hyderabad', 'A popular mall for modern shopping, movies, and dining.', inorbitMallImage],
       ['Paradise Biryani', 'Restaurant', 'Secunderabad, Hyderabad', 'One of the best-known restaurant names associated with Hyderabad biryani.', foodImage],
     ],
   },

@@ -20,6 +20,32 @@ const cityImage = {
   Vizag: '/uploads/images/city-vizag.jpeg',
 };
 
+const attractionImage = {
+  Charminar: '/uploads/images/attraction-charminar.png',
+  'Golconda Fort': '/uploads/images/attraction-golconda-fort.png',
+  'Salar Jung Museum': '/uploads/images/attraction-salar-jung-museum.png',
+  'Hussain Sagar': '/uploads/images/attraction-hussain-sagar.png',
+  'Inorbit Mall': '/uploads/images/attraction-inorbit-mall-hyderabad.png',
+  'Inorbit Mall Hyderabad': '/uploads/images/attraction-inorbit-mall-hyderabad.png',
+  'Cubbon Park': '/uploads/images/attraction-cubbon-park.png',
+  'Orion Mall': '/uploads/images/attraction-orion-mall.png',
+  MTR: '/uploads/images/attraction-mtr-bengaluru.png',
+  'MTR Bengaluru': '/uploads/images/attraction-mtr-bengaluru.png',
+  'Undavalli Caves': '/uploads/images/attraction-undavalli-caves.png',
+  'Bhavani Island': '/uploads/images/attraction-bhavani-island.png',
+  'PVP Square Mall': '/uploads/images/attraction-pvp-square-mall.png',
+  'Mangalagiri Eco Park': '/uploads/images/attraction-mangalagiri-eco-park.png',
+  'Mangalagiri Handloom Market': '/uploads/images/attraction-mangalagiri-handloom-market.png',
+  'Capital Mall Mangalagiri': '/uploads/images/attraction-capital-mall-mangalagiri.png',
+  'Andhra Spice Kitchen Mangalagiri': '/uploads/images/attraction-andhra-spice-kitchen-mangalagiri.png',
+  'RK Beach': '/uploads/images/attraction-rk-beach.png',
+  Kailasagiri: '/uploads/images/attraction-kailasagiri.png',
+  'INS Kurusura Submarine Museum': '/uploads/images/attraction-ins-kurusura-submarine-museum.png',
+  'CMR Central Vizag': '/uploads/images/attraction-cmr-central-vizag.png',
+  'Dharani Restaurant': '/uploads/images/attraction-dharani-restaurant-vizag.png',
+  'Dharani Restaurant Vizag': '/uploads/images/attraction-dharani-restaurant-vizag.png',
+};
+
 const targetCities = [
   {
     cityName: 'Mumbai',
@@ -199,6 +225,8 @@ const imageForCategory = (category) => {
   return 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1200&q=80';
 };
 
+const imageForPlace = (place) => attractionImage[place.name] || imageForCategory(place.category);
+
 const run = async () => {
   try {
     await connectDB();
@@ -239,7 +267,7 @@ const run = async () => {
               description: `${item.name} is a popular ${item.category.toLowerCase()} in ${city.cityName}.`,
               location: item.location,
               category: item.category,
-              imageUrl: imageForCategory(item.category),
+              imageUrl: imageForPlace(item),
               latitude: item.latitude,
               longitude: item.longitude,
               timings: '9:00 AM - 9:00 PM',
