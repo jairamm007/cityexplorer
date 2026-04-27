@@ -1,9 +1,11 @@
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { buildDirectionsUrl, formatDistance, haversineDistanceKm } from '../utils/userMapHelpers';
 import { resolveImageUrl } from '../utils/userImageHelpers';
 
 const CityCard = ({ city, currentLocation, placeCount = 0 }) => {
   const navigate = useNavigate();
+  const [imageFailed, setImageFailed] = useState(false);
   const cityImage = resolveImageUrl(city.imageUrl || '');
   const ownerName = city.createdBy?.name;
   const ownerEmail = city.createdBy?.email;
@@ -23,6 +25,10 @@ const CityCard = ({ city, currentLocation, placeCount = 0 }) => {
     }
   };
 
+  useEffect(() => {
+    setImageFailed(false);
+  }, [city.imageUrl, city._id]);
+
   return (
     <div
       role="button"
@@ -32,14 +38,15 @@ const CityCard = ({ city, currentLocation, placeCount = 0 }) => {
       className="group cursor-pointer overflow-hidden rounded-[32px] bg-white shadow-xl transition duration-300 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-amber-300"
     >
       <div className="h-64 overflow-hidden bg-slate-100">
-        {cityImage ? (
+        {cityImage && !imageFailed ? (
           <img
             src={cityImage}
             alt={city.cityName}
             className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            onError={() => setImageFailed(true)}
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-slate-400">No image</div>
+          <div className="flex h-full items-center justify-center text-slate-400">Image unavailable</div>
         )}
       </div>
       <div className="space-y-4 p-6">

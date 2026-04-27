@@ -1,9 +1,11 @@
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { buildDirectionsUrl, formatDistance, haversineDistanceKm } from '../utils/userMapHelpers';
 import { resolveImageUrl } from '../utils/userImageHelpers';
 
 const AttractionCard = ({ attraction, currentLocation }) => {
   const navigate = useNavigate();
+  const [imageFailed, setImageFailed] = useState(false);
   const attractionImage = resolveImageUrl(attraction.imageUrl || '');
   const ownerName = attraction.createdBy?.name;
   const ownerEmail = attraction.createdBy?.email;
@@ -28,6 +30,10 @@ const AttractionCard = ({ attraction, currentLocation }) => {
     }
   };
 
+  useEffect(() => {
+    setImageFailed(false);
+  }, [attraction.imageUrl, attraction._id]);
+
   return (
     <div
       role="button"
@@ -37,10 +43,15 @@ const AttractionCard = ({ attraction, currentLocation }) => {
       className="cursor-pointer rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-300"
     >
       <div className="mb-4 h-48 overflow-hidden rounded-3xl bg-slate-100">
-        {attractionImage ? (
-          <img src={attractionImage} alt={attraction.name} className="h-full w-full object-cover" />
+        {attractionImage && !imageFailed ? (
+          <img
+            src={attractionImage}
+            alt={attraction.name}
+            className="h-full w-full object-cover"
+            onError={() => setImageFailed(true)}
+          />
         ) : (
-          <div className="flex h-full items-center justify-center text-slate-400">No image</div>
+          <div className="flex h-full items-center justify-center text-slate-400">Image unavailable</div>
         )}
       </div>
       <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-slate-600">

@@ -62,7 +62,7 @@ const PlaceCard = ({ place, onDelete, deleting }) => {
   const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(`${place.name} ${place.cityId?.cityName || ''}`.trim())}`;
 
   const openPlace = () => {
-    navigate(`/place/${place._id}`);
+    navigate(`/admin/place/${place._id}`);
   };
 
   const handleCardKeyDown = (event) => {
@@ -97,7 +97,7 @@ const PlaceCard = ({ place, onDelete, deleting }) => {
         {place.description ? <p className="text-sm text-slate-600 line-clamp-3">{place.description}</p> : null}
         <div className="flex flex-wrap gap-3 pt-2">
           <Link
-            to={`/place/${place._id}`}
+            to={`/admin/place/${place._id}`}
             onClick={(event) => event.stopPropagation()}
             className="inline-flex rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
           >

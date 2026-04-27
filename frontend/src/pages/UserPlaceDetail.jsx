@@ -75,6 +75,7 @@ const PlaceDetail = () => {
   const [savingFavorite, setSavingFavorite] = useState(false);
   const [savingTrip, setSavingTrip] = useState(false);
   const [deletingPlace, setDeletingPlace] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
   const [tripForm, setTripForm] = useState({
     visitDate: '',
     travelers: 1,
@@ -342,6 +343,10 @@ const PlaceDetail = () => {
 
   const attractionImage = resolveImageUrl(attraction.imageUrl || '');
 
+  useEffect(() => {
+    setImageFailed(false);
+  }, [attraction.imageUrl, attraction._id]);
+
   const weatherDisplay = weather?.current_weather;
   const daily = weather?.daily;
   const weatherReport = weatherDisplay ? buildWeatherReport(weatherDisplay.weathercode) : null;
@@ -397,10 +402,15 @@ const PlaceDetail = () => {
 
         <div className="mt-6 grid gap-6 md:grid-cols-2">
           <div className="overflow-hidden rounded-3xl bg-slate-100">
-            {attractionImage ? (
-              <img src={attractionImage} alt={attraction.name} className="h-full w-full object-cover" />
+            {attractionImage && !imageFailed ? (
+              <img
+                src={attractionImage}
+                alt={attraction.name}
+                className="h-full w-full object-cover"
+                onError={() => setImageFailed(true)}
+              />
             ) : (
-              <div className="flex h-72 items-center justify-center text-slate-400">No image available</div>
+              <div className="flex h-72 items-center justify-center text-slate-400">Image unavailable</div>
             )}
           </div>
 

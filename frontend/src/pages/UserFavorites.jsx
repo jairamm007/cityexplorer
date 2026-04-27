@@ -5,6 +5,37 @@ import { useAuth } from '../components/UserAuthContext';
 import api from '../services/userApi';
 import { resolveImageUrl } from '../utils/userImageHelpers';
 
+const PlannerImage = ({ src, alt }) => {
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setFailed(false);
+  }, [src]);
+
+  if (!src || failed) {
+    return (
+      <div className="flex h-44 w-full items-center justify-center rounded-2xl bg-slate-200 text-sm text-slate-500">
+        Image unavailable
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className="h-44 w-full rounded-2xl object-cover"
+      onError={() => setFailed(true)}
+    />
+  );
+};
+
+const sanitizeTravelData = (nextUser) => ({
+  favoriteDestinations: (nextUser?.favoriteDestinations || []).filter(Boolean),
+  favoriteAttractions: (nextUser?.favoriteAttractions || []).filter(Boolean),
+  plannedTrips: (nextUser?.plannedTrips || []).filter((trip) => Boolean(trip && trip._id)),
+});
+
 const PlannerSectionSkeleton = ({ cards = 3, compact = false }) => (
   <section className="rounded-3xl bg-white p-8 shadow-lg">
     <div className="h-8 w-56 animate-pulse rounded-full bg-slate-200" />
@@ -62,9 +93,10 @@ const Favorites = () => {
   const [loading, setLoading] = useState(true);
 
   const syncTravelData = (nextUser) => {
-    setFavoriteCities(nextUser.favoriteDestinations || []);
-    setFavoriteAttractions(nextUser.favoriteAttractions || []);
-    setPlannedTrips(nextUser.plannedTrips || []);
+    const safeData = sanitizeTravelData(nextUser);
+    setFavoriteCities(safeData.favoriteDestinations);
+    setFavoriteAttractions(safeData.favoriteAttractions);
+    setPlannedTrips(safeData.plannedTrips);
     updateUser(nextUser);
   };
 
@@ -78,9 +110,10 @@ const Favorites = () => {
     }
 
     // Show cached planner data immediately while the latest profile loads once.
-    setFavoriteCities(user.favoriteDestinations || []);
-    setFavoriteAttractions(user.favoriteAttractions || []);
-    setPlannedTrips(user.plannedTrips || []);
+    const safeCachedData = sanitizeTravelData(user);
+    setFavoriteCities(safeCachedData.favoriteDestinations);
+    setFavoriteAttractions(safeCachedData.favoriteAttractions);
+    setPlannedTrips(safeCachedData.plannedTrips);
 
     const fetchTravelData = async () => {
       if (!user?.id && !user?._id) {
@@ -168,9 +201,7 @@ const Favorites = () => {
               <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                 {favoriteCities.map((city) => (
                   <div key={city._id} className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
-                    {city.imageUrl ? (
-                      <img src={resolveImageUrl(city.imageUrl)} alt={city.cityName} className="h-44 w-full rounded-2xl object-cover" />
-                    ) : null}
+                    <PlannerImage src={resolveImageUrl(city.imageUrl || '')} alt={city.cityName} />
                     <h3 className="mt-4 text-xl font-semibold">{city.cityName}</h3>
                     <p className="mt-2 text-slate-600">{city.country}</p>
                     <div className="mt-5 flex gap-3">

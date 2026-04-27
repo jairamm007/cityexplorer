@@ -9,7 +9,7 @@ const AdminAttractionCard = ({ attraction, onDelete, deleting = false }) => {
   const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(`${attraction.name} ${attraction.cityId?.cityName || ''}`.trim())}`;
 
   const openPlace = () => {
-    navigate(`/place/${attraction._id}`);
+    navigate(`/admin/place/${attraction._id}`);
   };
 
   const handleCardKeyDown = (event) => {
@@ -46,7 +46,7 @@ const AdminAttractionCard = ({ attraction, onDelete, deleting = false }) => {
       <p className="mt-3 text-sm text-slate-500">Location: {attraction.location}</p>
       <div className="mt-4 flex flex-wrap gap-3">
         <Link
-          to={`/place/${attraction._id}`}
+          to={`/admin/place/${attraction._id}`}
           onClick={(event) => event.stopPropagation()}
           className="inline-flex rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
         >

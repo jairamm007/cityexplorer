@@ -1,4 +1,5 @@
 import { Suspense, lazy } from 'react';
+import { Navigate } from 'react-router-dom';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -76,6 +77,14 @@ function App() {
               }
             />
             <Route
+              path="/place/:id"
+              element={
+                <ProtectedRoute>
+                  <PlaceDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/dashboard"
               element={
                 <ProtectedRoute>
@@ -115,6 +124,9 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/planner" element={<Navigate to="/favorites" replace />} />
+            <Route path="/admin-portal" element={<Navigate to="/admin" replace />} />
+            <Route path="/adminportal" element={<Navigate to="/admin" replace />} />
             <Route
               path="/support"
               element={

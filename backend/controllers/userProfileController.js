@@ -6,6 +6,21 @@ const { resolveUploadedImageUrl } = require('../utils/resolveUploadedImageUrl');
 const { generateProfileNameSuggestions } = require('../utils/profileNameSuggestions');
 const { isProfileNameTaken, normalizeProfileName } = require('../utils/profileName');
 
+const sanitizeTravelCollections = (userDoc) => {
+  if (!userDoc) {
+    return userDoc;
+  }
+
+  const safeUser = userDoc.toObject ? userDoc.toObject() : { ...userDoc };
+  safeUser.favoriteDestinations = (safeUser.favoriteDestinations || []).filter(Boolean);
+  safeUser.favoriteAttractions = (safeUser.favoriteAttractions || []).filter(Boolean);
+  safeUser.plannedTrips = (safeUser.plannedTrips || []).filter(
+    (trip) => Boolean(trip && trip._id && trip.attractionId)
+  );
+
+  return safeUser;
+};
+
 const populatedUserQuery = (userId) =>
   User.findById(userId)
     .select('-password -verificationToken -resetPasswordToken')
@@ -36,7 +51,7 @@ const getUserProfile = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    res.json(user);
+    res.json(sanitizeTravelCollections(user));
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -85,7 +100,7 @@ const updateUserProfile = async (req, res) => {
 
     const updatedUser = await populatedUserQuery(req.user.id);
 
-    res.json({ message: 'Profile updated successfully', user: updatedUser });
+    res.json({ message: 'Profile updated successfully', user: sanitizeTravelCollections(updatedUser) });
   } catch (error) {
     res.status(500).json({ message: 'Server error while updating profile' });
   }
@@ -138,7 +153,7 @@ const addFavoriteCity = async (req, res) => {
 
     const updatedUser = await populatedUserQuery(req.user.id);
 
-    res.json({ message: 'City added to favorites', user: updatedUser });
+    res.json({ message: 'City added to favorites', user: sanitizeTravelCollections(updatedUser) });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -161,7 +176,7 @@ const removeFavoriteCity = async (req, res) => {
 
     const updatedUser = await populatedUserQuery(req.user.id);
 
-    res.json({ message: 'City removed from favorites', user: updatedUser });
+    res.json({ message: 'City removed from favorites', user: sanitizeTravelCollections(updatedUser) });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -187,7 +202,7 @@ const uploadProfileImage = async (req, res) => {
     res.json({
       message: 'Profile image uploaded successfully',
       profileImage: user.profileImage,
-      user: updatedUser,
+      user: sanitizeTravelCollections(updatedUser),
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error while uploading profile image' });
@@ -217,7 +232,7 @@ const addFavoriteAttraction = async (req, res) => {
     }
 
     const updatedUser = await populatedUserQuery(req.user.id);
-    res.json({ message: 'Attraction added to favorites', user: updatedUser });
+    res.json({ message: 'Attraction added to favorites', user: sanitizeTravelCollections(updatedUser) });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -238,7 +253,7 @@ const removeFavoriteAttraction = async (req, res) => {
     await user.save();
 
     const updatedUser = await populatedUserQuery(req.user.id);
-    res.json({ message: 'Attraction removed from favorites', user: updatedUser });
+    res.json({ message: 'Attraction removed from favorites', user: sanitizeTravelCollections(updatedUser) });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -280,7 +295,7 @@ const addPlannedTrip = async (req, res) => {
     await user.save();
 
     const updatedUser = await populatedUserQuery(req.user.id);
-    res.status(201).json({ message: 'Place added to your plans', user: updatedUser });
+    res.status(201).json({ message: 'Place added to your plans', user: sanitizeTravelCollections(updatedUser) });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -299,7 +314,7 @@ const removePlannedTrip = async (req, res) => {
     await user.save();
 
     const updatedUser = await populatedUserQuery(req.user.id);
-    res.json({ message: 'Place removed from your plans', user: updatedUser });
+    res.json({ message: 'Place removed from your plans', user: sanitizeTravelCollections(updatedUser) });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }

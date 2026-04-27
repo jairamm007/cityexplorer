@@ -144,6 +144,7 @@ const CityDetail = () => {
   const [savingFavorite, setSavingFavorite] = useState(false);
   const [planningPlaceId, setPlanningPlaceId] = useState('');
   const [deleting, setDeleting] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
 
   useEffect(() => {
     const loadCity = async () => {
@@ -497,6 +498,10 @@ const CityDetail = () => {
   const cityImage = resolveImageUrl(city.imageUrl || '');
   const cityGoogleUrl = `https://www.google.com/search?q=${encodeURIComponent(`${city.cityName} ${city.country || ''}`.trim())}`;
 
+  useEffect(() => {
+    setImageFailed(false);
+  }, [city.imageUrl, city._id]);
+
   const weatherDisplay = weather?.current_weather;
   const daily = weather?.daily;
   const weatherReport = weatherDisplay ? buildWeatherReport(weatherDisplay.weathercode) : null;
@@ -506,10 +511,15 @@ const CityDetail = () => {
     <div className="space-y-10">
       <section className="overflow-hidden rounded-[40px] bg-white shadow-xl">
         <div className="relative h-96 w-full">
-          {cityImage ? (
-            <img src={cityImage} alt={city.cityName} className="h-full w-full object-cover" />
+          {cityImage && !imageFailed ? (
+            <img
+              src={cityImage}
+              alt={city.cityName}
+              className="h-full w-full object-cover"
+              onError={() => setImageFailed(true)}
+            />
           ) : (
-            <div className="flex h-full items-center justify-center bg-slate-100 text-slate-500">No image available</div>
+            <div className="flex h-full items-center justify-center bg-slate-100 text-slate-500">Image unavailable</div>
           )}
         </div>
         <div className="space-y-6 p-8">
