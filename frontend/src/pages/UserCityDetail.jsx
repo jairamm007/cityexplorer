@@ -491,16 +491,16 @@ const CityDetail = () => {
     }
   };
 
+  useEffect(() => {
+    setImageFailed(false);
+  }, [city?.imageUrl, city?._id]);
+
   if (loading || !city) {
     return <p className="text-slate-500">Loading city details...</p>;
   }
 
   const cityImage = resolveImageUrl(city.imageUrl || '');
   const cityGoogleUrl = `https://www.google.com/search?q=${encodeURIComponent(`${city.cityName} ${city.country || ''}`.trim())}`;
-
-  useEffect(() => {
-    setImageFailed(false);
-  }, [city.imageUrl, city._id]);
 
   const weatherDisplay = weather?.current_weather;
   const daily = weather?.daily;

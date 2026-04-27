@@ -144,7 +144,7 @@ const Dashboard = () => {
     }
 
     setPlacesOpen(true);
-    navigate(`/places?cityId=${encodeURIComponent(cityId)}#places`);
+    navigate(`/admin/places?cityId=${encodeURIComponent(cityId)}#places`);
 
     requestAnimationFrame(() => {
       const element = document.getElementById('places');

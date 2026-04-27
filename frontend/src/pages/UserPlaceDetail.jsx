@@ -337,15 +337,15 @@ const PlaceDetail = () => {
     }
   };
 
+  useEffect(() => {
+    setImageFailed(false);
+  }, [attraction?.imageUrl, attraction?._id]);
+
   if (!attraction) {
     return <p className="text-slate-500">Loading place details...</p>;
   }
 
   const attractionImage = resolveImageUrl(attraction.imageUrl || '');
-
-  useEffect(() => {
-    setImageFailed(false);
-  }, [attraction.imageUrl, attraction._id]);
 
   const weatherDisplay = weather?.current_weather;
   const daily = weather?.daily;
