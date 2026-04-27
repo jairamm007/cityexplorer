@@ -1,5 +1,6 @@
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
 const User = require('../models/User');
 const City = require('../models/City');
 const Attraction = require('../models/Attraction');
@@ -7,6 +8,11 @@ const { resolveUploadedImageUrl } = require('../utils/resolveUploadedImageUrl');
 const { generateProfileNameSuggestions } = require('../utils/profileNameSuggestions');
 const { isProfileNameTaken, normalizeProfileName, toProfileNameKey } = require('../utils/profileName');
 const { generateToken } = require('../utils/jwt');
+
+const createLocalAuthIdentity = () => {
+  const _id = new mongoose.Types.ObjectId();
+  return { _id, googleId: `local:${_id}` };
+};
 
 const bootstrapAdmin = async () => {
   const adminName = process.env.ADMIN_NAME;
@@ -31,6 +37,7 @@ const bootstrapAdmin = async () => {
   }
 
   return User.create({
+    ...createLocalAuthIdentity(),
     name: adminName,
     email: adminEmail,
     password: bcryptHash,

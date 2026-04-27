@@ -35,6 +35,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/utils', utilityRoutes);
 app.use('/api/images', imageRoutes);
+app.use('/images', imageRoutes);
 
 // Keep unknown API routes as API 404 responses.
 app.use('/api', notFound);

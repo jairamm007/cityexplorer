@@ -1,10 +1,16 @@
 const path = require('path');
 const dotenv = require('dotenv');
 const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
 const connectDB = require('../config/db');
 const User = require('../models/User');
 
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
+
+const createLocalAuthIdentity = () => {
+  const _id = new mongoose.Types.ObjectId();
+  return { _id, googleId: `local:${_id}` };
+};
 
 const createAdmin = async () => {
   const adminName = process.env.ADMIN_NAME;
@@ -34,6 +40,7 @@ const createAdmin = async () => {
       console.log(`Updated existing user ${normalizedEmail} to admin.`);
     } else {
       await User.create({
+        ...createLocalAuthIdentity(),
         name: adminName,
         email: normalizedEmail,
         password: hashedPassword,

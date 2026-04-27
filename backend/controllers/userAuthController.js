@@ -1,5 +1,6 @@
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
 const { OAuth2Client } = require('google-auth-library');
 const User = require('../models/User');
 const { generateProfileNameSuggestions } = require('../utils/profileNameSuggestions');
@@ -9,6 +10,10 @@ const { generateToken } = require('../utils/jwt');
 const googleClient = process.env.GOOGLE_CLIENT_ID ? new OAuth2Client(process.env.GOOGLE_CLIENT_ID) : null;
 
 const isLocalPlaceholderGoogleId = (value) => typeof value === 'string' && value.startsWith('local:');
+const createLocalAuthIdentity = () => {
+  const _id = new mongoose.Types.ObjectId();
+  return { _id, googleId: `local:${_id}` };
+};
 
 const serializeUser = (user) => ({
   id: user._id,
@@ -56,6 +61,7 @@ const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = await User.create({
+      ...createLocalAuthIdentity(),
       name: normalizedName,
       email: normalizedEmail,
       password: hashedPassword,

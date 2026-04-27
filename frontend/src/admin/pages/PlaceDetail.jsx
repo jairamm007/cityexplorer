@@ -68,6 +68,7 @@ const PlaceDetail = () => {
   const [trackingLocation, setTrackingLocation] = useState(false);
   const [loading, setLoading] = useState(true);
   const [deletingPlace, setDeletingPlace] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
 
   useEffect(() => {
     const loadPlace = async () => {
@@ -119,6 +120,10 @@ const PlaceDetail = () => {
 
     loadCoords();
   }, [place]);
+
+  useEffect(() => {
+    setImageFailed(false);
+  }, [place?.imageUrl, place?._id]);
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -328,10 +333,15 @@ const PlaceDetail = () => {
       <section className="grid gap-6 xl:grid-cols-3">
         <article className="overflow-hidden rounded-[30px] border border-slate-200 bg-white shadow-xl xl:col-span-2">
           <div className="h-72 bg-slate-100">
-            {placeImage ? (
-              <img src={placeImage} alt={place.name} className="h-full w-full object-cover" />
+            {placeImage && !imageFailed ? (
+              <img
+                src={placeImage}
+                alt={place.name}
+                className="h-full w-full object-cover"
+                onError={() => setImageFailed(true)}
+              />
             ) : (
-              <div className="flex h-full items-center justify-center text-slate-400">No image available</div>
+              <div className="flex h-full items-center justify-center text-slate-400">Image unavailable</div>
             )}
           </div>
           <div className="p-6 text-sm text-slate-600">

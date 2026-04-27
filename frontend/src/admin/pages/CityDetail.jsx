@@ -60,6 +60,11 @@ const PlaceCard = ({ place, onDelete, deleting }) => {
   const ownerName = place.createdBy?.name;
   const ownerEmail = place.createdBy?.email;
   const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(`${place.name} ${place.cityId?.cityName || ''}`.trim())}`;
+  const [imageFailed, setImageFailed] = useState(false);
+
+  useEffect(() => {
+    setImageFailed(false);
+  }, [place.imageUrl, place._id]);
 
   const openPlace = () => {
     navigate(`/admin/place/${place._id}`);
@@ -81,10 +86,15 @@ const PlaceCard = ({ place, onDelete, deleting }) => {
       className="cursor-pointer overflow-hidden rounded-[30px] border border-slate-200 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-300"
     >
       <div className="h-48 bg-slate-100">
-        {imageUrl ? (
-          <img src={imageUrl} alt={place.name} className="h-full w-full object-cover" />
+        {imageUrl && !imageFailed ? (
+          <img
+            src={imageUrl}
+            alt={place.name}
+            className="h-full w-full object-cover"
+            onError={() => setImageFailed(true)}
+          />
         ) : (
-          <div className="flex h-full items-center justify-center text-slate-400">No image</div>
+          <div className="flex h-full items-center justify-center text-slate-400">Image unavailable</div>
         )}
       </div>
       <div className="space-y-3 p-5">
