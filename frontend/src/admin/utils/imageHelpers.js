@@ -1,39 +1,4 @@
-const hostedApiFallback = 'https://cityexplorer-backend.onrender.com/api';
-const hostedApiHost = new URL(hostedApiFallback).hostname;
-
-const resolveProductionApiBaseUrl = () => {
-  const configuredApiUrl = String(import.meta.env.VITE_API_URL || '').trim();
-  if (typeof window !== 'undefined') {
-    const hostname = String(window.location.hostname || '').toLowerCase();
-
-    // If frontend is served from the backend host itself, keep same-origin API calls.
-    if (hostname === hostedApiHost) {
-      return '/api';
-    }
-
-    if (configuredApiUrl && configuredApiUrl !== '/api') {
-      return configuredApiUrl;
-    }
-
-    // Static/mobile clients hosted away from the backend need the public API host.
-    return hostedApiFallback;
-  }
-
-  if (configuredApiUrl && configuredApiUrl !== '/api') {
-    return configuredApiUrl;
-  }
-
-  return hostedApiFallback;
-};
-
-const resolveApiBaseUrl = () => {
-  const configuredApiUrl = String(import.meta.env.VITE_API_URL || '').trim();
-  if (configuredApiUrl) {
-    return configuredApiUrl;
-  }
-
-  return import.meta.env.DEV ? '/api' : resolveProductionApiBaseUrl();
-};
+import { resolveApiBaseUrl } from '../../utils/apiBaseUrl';
 
 const apiBaseUrl = resolveApiBaseUrl();
 

@@ -150,6 +150,7 @@ const CityDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [city, setCity] = useState(null);
+  const [imageFailed, setImageFailed] = useState(false);
   const [places, setPlaces] = useState([]);
   const [coords, setCoords] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
@@ -295,6 +296,10 @@ const CityDetail = () => {
     fetchRoute();
   }, [coords, currentLocation]);
 
+  useEffect(() => {
+    setImageFailed(false);
+  }, [city?.imageUrl, city?._id]);
+
   const deleteCity = async () => {
     const confirmed = window.confirm('Delete this city? This cannot be undone.');
     if (!confirmed) {
@@ -402,8 +407,13 @@ const CityDetail = () => {
     <div className="space-y-8">
       <section className="overflow-hidden rounded-[40px] bg-white shadow-xl">
         <div className="h-64 w-full bg-slate-100 md:h-80">
-          {cityImage ? (
-            <img src={cityImage} alt={city.cityName} className="h-full w-full object-cover" />
+          {cityImage && !imageFailed ? (
+            <img
+              src={cityImage}
+              alt={city.cityName}
+              className="h-full w-full object-cover"
+              onError={() => setImageFailed(true)}
+            />
           ) : (
             <div className="flex h-full items-center justify-center text-slate-400">No city image</div>
           )}
