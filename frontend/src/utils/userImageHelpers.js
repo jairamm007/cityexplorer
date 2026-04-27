@@ -26,9 +26,16 @@ const resolveProductionApiBaseUrl = () => {
   return hostedApiFallback;
 };
 
-const apiBaseUrl = import.meta.env.DEV
-  ? '/api'
-  : resolveProductionApiBaseUrl();
+const resolveApiBaseUrl = () => {
+  const configuredApiUrl = String(import.meta.env.VITE_API_URL || '').trim();
+  if (configuredApiUrl) {
+    return configuredApiUrl;
+  }
+
+  return import.meta.env.DEV ? '/api' : resolveProductionApiBaseUrl();
+};
+
+const apiBaseUrl = resolveApiBaseUrl();
 
 const bareImageIdPattern = /^[a-f0-9]{24}$/i;
 

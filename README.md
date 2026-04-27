@@ -323,6 +323,8 @@ VITE_API_URL=http://localhost:8000/api
 VITE_ROUTER_BASENAME=/
 ```
 
+If the frontend and backend are deployed on different hosts, set `VITE_API_URL` to the full backend API origin. Image uploads from the user and admin file pickers are saved through the backend, stored in MongoDB, and the returned `/api/images/<id>` URL is what the cards render.
+
 ---
 
 ## ▶️ Running the Application
@@ -526,6 +528,14 @@ Solution:
 1. Ensure backend is running on port 8000
 2. Check VITE_API_URL in frontend/.env
 3. Verify CORS is enabled in backend
+```
+
+**Problem**: Uploaded city/place photos say they saved, but still show "Image unavailable"
+```
+Solution:
+1. Confirm the upload request returns an `imageUrl` like `/api/images/<id>`
+2. Make sure `VITE_API_URL` points at the backend API when frontend and backend are on different hosts
+3. Rebuild and redeploy the frontend after changing environment values
 ```
 
 ### Port Already in Use
