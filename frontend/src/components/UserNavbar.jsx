@@ -17,8 +17,8 @@ const Navbar = () => {
   const isPlaceMenuActive = isPlacesActive || location.pathname.startsWith('/attraction') || location.pathname.startsWith('/dashboard/add-place');
 
   return (
-    <header className="bg-white shadow-sm">
-      <div className="flex w-full flex-col gap-4 px-4 py-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:px-6">
+    <header className="bg-white shadow-sm overflow-visible">
+      <div className="relative flex w-full flex-col gap-4 px-4 py-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:px-6 overflow-visible">
         <Link to={user ? '/' : '/login'} className="inline-flex items-center gap-2 text-xl font-semibold text-amber-700">
           <span className="inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-amber-100">
             <img src="/favicon.svg" alt="CityExplorer logo" className="h-full w-full object-cover" />
@@ -35,11 +35,11 @@ const Navbar = () => {
               >
                 Home
               </NavLink>
-              <details className="relative">
+              <details className="relative overflow-visible">
                 <summary className={`ui-nav-ghost list-none cursor-pointer [&::-webkit-details-marker]:hidden ${isCityMenuActive ? 'ui-nav-ghost-active' : ''}`}>
                   Cities v
                 </summary>
-                <div className="absolute right-0 z-30 mt-2 w-52 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
+                <div className="absolute top-full right-0 z-50 mt-2 min-w-[13rem] rounded-2xl border border-slate-200 bg-white p-2 shadow-xl overflow-visible">
                   <Link to="/explore?view=cities" className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100">
                     Explore cities
                   </Link>
@@ -48,11 +48,11 @@ const Navbar = () => {
                   </Link>
                 </div>
               </details>
-              <details className="relative">
+              <details className="relative overflow-visible">
                 <summary className={`ui-nav-ghost list-none cursor-pointer [&::-webkit-details-marker]:hidden ${isPlaceMenuActive ? 'ui-nav-ghost-active' : ''}`}>
                   Places v
                 </summary>
-                <div className="absolute right-0 z-30 mt-2 w-52 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
+                <div className="absolute top-full right-0 z-50 mt-2 min-w-[13rem] rounded-2xl border border-slate-200 bg-white p-2 shadow-xl overflow-visible">
                   <Link to="/explore?view=attractions" className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100">
                     Explore places
                   </Link>
