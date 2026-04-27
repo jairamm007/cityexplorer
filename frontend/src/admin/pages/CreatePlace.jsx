@@ -190,7 +190,7 @@ const CreatePlace = () => {
       toast.success(`${placeForm.category} ${isEditMode ? 'updated' : 'saved'} successfully!`);
       const nextCityId = response.data.cityId?._id || response.data.cityId || placeForm.cityId;
       if (nextCityId) {
-        navigate(`/city/${nextCityId}`);
+        navigate(`/admin/city/${nextCityId}`);
       } else {
         navigate('/admin/places');
       }

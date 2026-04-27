@@ -242,7 +242,7 @@ const PlaceDetail = () => {
       await api.delete(`/attractions/${place._id}`);
       toast.success('Place deleted successfully');
       if (place.cityId?._id) {
-        navigate(`/city/${place.cityId._id}`);
+        navigate(`/admin/city/${place.cityId._id}`);
       } else {
         navigate('/admin/places');
       }
@@ -290,7 +290,7 @@ const PlaceDetail = () => {
             <p className="text-sm uppercase tracking-[0.2em] text-amber-600">{place.category || 'Place'}</p>
             <h1 className="mt-2 text-4xl font-semibold text-slate-900">{place.name}</h1>
             {place.cityId?._id ? (
-              <Link to={`/city/${place.cityId._id}`} className="mt-2 inline-flex text-sm font-semibold text-amber-700 hover:text-amber-800">
+              <Link to={`/admin/city/${place.cityId._id}`} className="mt-2 inline-flex text-sm font-semibold text-amber-700 hover:text-amber-800">
                 {place.cityId.cityName}, {place.cityId.country}
               </Link>
             ) : null}

@@ -43,9 +43,8 @@ const App = () => {
             <Route path="cities/new" element={<CreateCity />} />
             <Route path="cities/edit/:id" element={<CreateCity />} />
             <Route path="city/:id" element={<CityDetail />} />
-            <Route path="places/new" element={<CreatePlace />} />
-            <Route path="places/edit/:id" element={<CreatePlace />} />
             <Route path="place/:id" element={<PlaceDetail />} />
+            <Route path="create-city" element={<CreateCity />} />
           </Route>
           <Route path="*" element={<Navigate to={user?.role === 'admin' ? '/admin' : '/admin/login'} replace />} />
         </Routes>

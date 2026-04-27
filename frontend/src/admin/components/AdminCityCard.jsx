@@ -10,7 +10,7 @@ const AdminCityCard = ({ city, onDelete, onViewPlaces, deleting = false, placeCo
   const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(`${city.cityName} ${city.country || ''}`.trim())}`;
 
   const openCity = () => {
-    navigate(`/city/${cityId}`);
+    navigate(`/admin/city/${cityId}`);
   };
 
   const handleCardKeyDown = (event) => {
@@ -48,7 +48,7 @@ const AdminCityCard = ({ city, onDelete, onViewPlaces, deleting = false, placeCo
         <p className="text-slate-600">{city.description}</p>
         <div className="flex flex-wrap gap-3">
           <Link
-            to={`/city/${cityId}`}
+            to={`/admin/city/${cityId}`}
             onClick={(event) => event.stopPropagation()}
             className="inline-flex rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
           >

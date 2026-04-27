@@ -127,7 +127,7 @@ const CreateCity = () => {
             headers: { 'Content-Type': 'multipart/form-data' },
           });
       toast.success(isEditMode ? 'City updated successfully!' : 'City saved successfully!');
-      navigate(`/city/${response.data._id}`);
+      navigate(`/admin/city/${response.data._id}`);
     } catch (error) {
       const message =
         error.response?.data?.message ||
