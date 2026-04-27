@@ -1,4 +1,5 @@
 const { cloudinary, isCloudinaryEnabled } = require('../config/cloudinary');
+const UploadedImage = require('../models/UploadedImage');
 
 const uploadBufferToCloudinary = (file) =>
   new Promise((resolve, reject) => {
@@ -30,8 +31,15 @@ const resolveUploadedImageUrl = async (file) => {
     return uploadBufferToCloudinary(file);
   }
 
-  if (file.filename) {
-    return `/uploads/images/${file.filename}`;
+  if (file.buffer) {
+    const uploadedImage = await UploadedImage.create({
+      filename: file.originalname || 'uploaded-image',
+      contentType: file.mimetype,
+      size: file.size,
+      data: file.buffer,
+    });
+
+    return `/api/images/${uploadedImage._id}`;
   }
 
   return null;

@@ -145,10 +145,12 @@ const CityDetail = () => {
   const [planningPlaceId, setPlanningPlaceId] = useState('');
   const [deleting, setDeleting] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
+  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
     const loadCity = async () => {
       setLoading(true);
+      setLoadError('');
       try {
         const [cityRes, attractionsRes] = await Promise.all([
           api.get(`/cities/${id}`),
@@ -157,7 +159,11 @@ const CityDetail = () => {
         setCity(cityRes.data);
         setAttractions(attractionsRes.data);
       } catch (error) {
-        toast.error('Unable to load city details');
+        const message = error.response?.data?.message || 'Unable to load city details';
+        setLoadError(message);
+        setCity(null);
+        setAttractions([]);
+        toast.error(message);
       } finally {
         setLoading(false);
       }
@@ -495,8 +501,23 @@ const CityDetail = () => {
     setImageFailed(false);
   }, [city?.imageUrl, city?._id]);
 
-  if (loading || !city) {
+  if (loading) {
     return <p className="text-slate-500">Loading city details...</p>;
+  }
+
+  if (!city) {
+    return (
+      <section className="rounded-[32px] bg-white p-8 shadow-xl">
+        <p className="text-slate-700">{loadError || 'City not found.'}</p>
+        <button
+          type="button"
+          onClick={() => navigate('/dashboard')}
+          className="mt-5 rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
+        >
+          Back to dashboard
+        </button>
+      </section>
+    );
   }
 
   const cityImage = resolveImageUrl(city.imageUrl || '');

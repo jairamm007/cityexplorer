@@ -76,6 +76,8 @@ const PlaceDetail = () => {
   const [savingTrip, setSavingTrip] = useState(false);
   const [deletingPlace, setDeletingPlace] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [tripForm, setTripForm] = useState({
     visitDate: '',
     travelers: 1,
@@ -84,6 +86,8 @@ const PlaceDetail = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+      setLoadError('');
       try {
         const [detailRes, reviewsRes] = await Promise.all([
           api.get(`/attractions/${id}`),
@@ -92,7 +96,13 @@ const PlaceDetail = () => {
         setAttraction(detailRes.data);
         setReviews(reviewsRes.data);
       } catch (error) {
-        toast.error('Unable to load place details');
+        const message = error.response?.data?.message || 'Unable to load place details';
+        setLoadError(message);
+        setAttraction(null);
+        setReviews([]);
+        toast.error(message);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -341,8 +351,23 @@ const PlaceDetail = () => {
     setImageFailed(false);
   }, [attraction?.imageUrl, attraction?._id]);
 
-  if (!attraction) {
+  if (loading) {
     return <p className="text-slate-500">Loading place details...</p>;
+  }
+
+  if (!attraction) {
+    return (
+      <section className="rounded-[32px] bg-white p-8 shadow-xl">
+        <p className="text-slate-700">{loadError || 'Place not found.'}</p>
+        <button
+          type="button"
+          onClick={() => navigate('/dashboard')}
+          className="mt-5 rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
+        >
+          Back to dashboard
+        </button>
+      </section>
+    );
   }
 
   const attractionImage = resolveImageUrl(attraction.imageUrl || '');

@@ -11,6 +11,7 @@ const reviewRoutes = require('./routes/reviewRoutes');
 const userRoutes = require('./routes/userAccountRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const utilityRoutes = require('./routes/utilityRoutes');
+const imageRoutes = require('./routes/imageRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
 dotenv.config({ path: path.join(__dirname, '.env') });
@@ -33,6 +34,7 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/utils', utilityRoutes);
+app.use('/api/images', imageRoutes);
 
 // Keep unknown API routes as API 404 responses.
 app.use('/api', notFound);

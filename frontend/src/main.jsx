@@ -8,7 +8,7 @@ import { AuthProvider } from './components/UserAuthContext';
 import L from 'leaflet';
 
 const rawBasename = (import.meta.env.VITE_ROUTER_BASENAME || '/').trim();
-const configuredBasename = rawBasename === '/user' || rawBasename === '/user/'
+const configuredBasename = rawBasename === '/user' || rawBasename === '/user/' || rawBasename === '/admin' || rawBasename === '/admin/'
   ? '/'
   : (rawBasename || '/');
 const routerBasename = window.location.pathname.startsWith(configuredBasename)
