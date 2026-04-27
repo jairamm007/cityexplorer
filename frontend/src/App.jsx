@@ -7,6 +7,7 @@ import Navbar from './components/UserNavbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/UserProtectedRoute';
 import { useAuth } from './components/UserAuthContext';
+import { toastContainerProps } from './components/ToastCloseButton';
 import { AdminAuthProvider } from './admin/components/AuthContext';
 
 const Home = lazy(() => import('./pages/UserHome'));
@@ -147,10 +148,9 @@ function App() {
         </Suspense>
       </main>
       {!isAdminRoute ? <Footer /> : null}
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer {...toastContainerProps} />
     </div>
   );
 }
 
 export default App;
-

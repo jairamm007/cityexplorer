@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useAdminAuth } from './components/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminShell from './components/AdminShell';
+import { toastContainerProps } from '../components/ToastCloseButton';
 
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Login = lazy(() => import('./pages/Login'));
@@ -52,7 +53,7 @@ const App = () => {
           <Route path="*" element={<Navigate to={user?.role === 'admin' ? '/admin' : '/admin/login'} replace />} />
         </Routes>
       </Suspense>
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer {...toastContainerProps} />
     </div>
   );
 };
