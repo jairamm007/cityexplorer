@@ -1,4 +1,6 @@
-const User = require('../models/User');
+const mongoose = require('mongoose');
+
+const getUserModel = () => mongoose.model('User');
 
 const normalizeProfileName = (value) => String(value || '').trim();
 
@@ -26,7 +28,7 @@ const isProfileNameTaken = async (name, excludeUserId) => {
     query._id = { $ne: excludeUserId };
   }
 
-  const existingUser = await User.findOne(query).select('_id').lean();
+  const existingUser = await getUserModel().findOne(query).select('_id').lean();
   return Boolean(existingUser);
 };
 

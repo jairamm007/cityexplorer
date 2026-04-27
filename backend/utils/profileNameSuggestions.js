@@ -1,5 +1,7 @@
-const User = require('../models/User');
+const mongoose = require('mongoose');
 const { sanitizeSuggestionBase } = require('./profileName');
+
+const getUserModel = () => mongoose.model('User');
 
 const generateProfileNameSuggestions = async (requestedName, count = 3) => {
   const safeBase = sanitizeSuggestionBase(requestedName);
@@ -15,7 +17,7 @@ const generateProfileNameSuggestions = async (requestedName, count = 3) => {
   }
 
   const candidateList = [...candidates];
-  const existingUsers = await User.find(
+  const existingUsers = await getUserModel().find(
     { nameKey: { $in: candidateList.map((item) => item.toLowerCase()) } },
     'nameKey'
   ).lean();
