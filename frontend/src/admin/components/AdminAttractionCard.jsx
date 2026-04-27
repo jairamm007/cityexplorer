@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { resolveImageUrl } from '../utils/imageHelpers';
 
@@ -6,7 +7,12 @@ const AdminAttractionCard = ({ attraction, onDelete, deleting = false }) => {
   const attractionImage = resolveImageUrl(attraction.imageUrl || '');
   const ownerName = attraction.createdBy?.name;
   const ownerEmail = attraction.createdBy?.email;
+  const [imageFailed, setImageFailed] = useState(false);
   const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(`${attraction.name} ${attraction.cityId?.cityName || ''}`.trim())}`;
+
+  useEffect(() => {
+    setImageFailed(false);
+  }, [attraction.imageUrl, attraction._id]);
 
   const openPlace = () => {
     navigate(`/admin/place/${attraction._id}`);
@@ -28,10 +34,10 @@ const AdminAttractionCard = ({ attraction, onDelete, deleting = false }) => {
       className="cursor-pointer rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-300"
     >
       <div className="mb-4 h-48 overflow-hidden rounded-3xl bg-slate-100">
-        {attractionImage ? (
-          <img src={attractionImage} alt={attraction.name} className="h-full w-full object-cover" />
+        {attractionImage && !imageFailed ? (
+          <img src={attractionImage} alt={attraction.name} className="h-full w-full object-cover" onError={() => setImageFailed(true)} />
         ) : (
-          <div className="flex h-full items-center justify-center text-slate-400">No image</div>
+          <div className="flex h-full items-center justify-center text-slate-400">Image unavailable</div>
         )}
       </div>
       <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-slate-600">

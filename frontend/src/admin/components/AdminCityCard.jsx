@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { resolveImageUrl } from '../utils/imageHelpers';
 
@@ -7,7 +8,12 @@ const AdminCityCard = ({ city, onDelete, onViewPlaces, deleting = false, placeCo
   const ownerName = city.createdBy?.name;
   const ownerEmail = city.createdBy?.email;
   const cityId = city._id || city.id;
+  const [imageFailed, setImageFailed] = useState(false);
   const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(`${city.cityName} ${city.country || ''}`.trim())}`;
+
+  useEffect(() => {
+    setImageFailed(false);
+  }, [city.imageUrl, cityId]);
 
   const openCity = () => {
     navigate(`/admin/city/${cityId}`);
@@ -29,14 +35,15 @@ const AdminCityCard = ({ city, onDelete, onViewPlaces, deleting = false, placeCo
       className="group cursor-pointer overflow-hidden rounded-[32px] bg-white shadow-xl transition duration-300 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-amber-300"
     >
       <div className="h-64 overflow-hidden bg-slate-100">
-        {cityImage ? (
+        {cityImage && !imageFailed ? (
           <img
             src={cityImage}
             alt={city.cityName}
             className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            onError={() => setImageFailed(true)}
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-slate-400">No image</div>
+          <div className="flex h-full items-center justify-center text-slate-400">Image unavailable</div>
         )}
       </div>
       <div className="space-y-4 p-6">

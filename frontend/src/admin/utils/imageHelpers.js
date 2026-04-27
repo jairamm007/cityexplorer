@@ -6,11 +6,17 @@ const resolveProductionApiBaseUrl = () => {
     return configuredApiUrl;
   }
 
-  if (typeof window !== 'undefined' && window.location.hostname.endsWith('netlify.app')) {
-    return hostedApiFallback;
+  if (typeof window !== 'undefined') {
+    const hostname = String(window.location.hostname || '').toLowerCase();
+
+    // If frontend is served from the backend host itself, keep same-origin API calls.
+    if (hostname.endsWith('onrender.com')) {
+      return '/api';
+    }
   }
 
-  return '/api';
+  // For static hosting (Netlify/custom domains), default to hosted backend.
+  return hostedApiFallback;
 };
 
 const apiBaseUrl = import.meta.env.DEV

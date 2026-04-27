@@ -42,9 +42,12 @@ const App = () => {
             <Route path="profile" element={<AdminProfile />} />
             <Route path="cities/new" element={<CreateCity />} />
             <Route path="cities/edit/:id" element={<CreateCity />} />
+            <Route path="places/new" element={<CreatePlace />} />
+            <Route path="places/edit/:id" element={<CreatePlace />} />
             <Route path="city/:id" element={<CityDetail />} />
             <Route path="place/:id" element={<PlaceDetail />} />
             <Route path="create-city" element={<CreateCity />} />
+            <Route path="create-place" element={<CreatePlace />} />
           </Route>
           <Route path="*" element={<Navigate to={user?.role === 'admin' ? '/admin' : '/admin/login'} replace />} />
         </Routes>
