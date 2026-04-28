@@ -6,7 +6,7 @@
 
 A full-stack web application built using **MERN stack** (MongoDB, Express.js, React.js, Node.js) that allows users to explore cities, discover popular attractions, and manage travel-related information in an interactive and user-friendly interface.
 
-if you want visit website click here 👉: https://cityexp10rer.netlify.app/login
+if you want visit website click here 👉: https://cityexp10rer.vercel.app/login
 ---
 
 ## 📋 Table of Contents
